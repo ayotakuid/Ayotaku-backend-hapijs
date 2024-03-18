@@ -1,0 +1,28 @@
+{
+  "name": "ayotaku-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start-dev": "nodemon server.js",
+    "lint": "eslint ./"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@hapi/hapi": "^21.3.6",
+    "axios": "^1.6.8",
+    "bcrypt": "^5.1.1",
+    "hapi-auth-jwt2": "^10.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.5.0"
+  }
+}
