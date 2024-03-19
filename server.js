@@ -25,7 +25,7 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['*'],
+        origin: ['http://127.0.0.1:8000'],
         credentials: true,
       },
     },

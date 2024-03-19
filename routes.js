@@ -2,11 +2,12 @@ const { handlerViewUsers, handlerLoginAdmin, handlerCallbackFromMal } = require(
 
 const routes = [
   {
-    method: 'GET',
+    method: 'POST',
     path: '/api/admin/callback',
     handler: handlerCallbackFromMal,
     options: {
       auth: false,
+      cors: true,
     },
   },
 ];

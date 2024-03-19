@@ -1,8 +1,14 @@
 const JWT = require('jsonwebtoken');
 const Boom = require('@hapi/boom');
 const Bcrypt = require('bcrypt');
-const { secretKey, MAL_URI_TOKEN } = require('../utils/secret.json');
-// const axios = require('axios').default;
+const axios = require('axios');
+const {
+  secretKey,
+} = require('../utils/secret.json');
+const {
+  handlerGetToken,
+  handlerGetFullProfileMAL,
+} = require('../utils/handler-axios');
 
 const createToken = (user) => {
   const data = {
@@ -40,12 +46,30 @@ const handlerLoginAdmin = (request, h) => {
   return response;
 };
 
-const handlerCallbackFromMal = (request, h) => {
-  const { code } = request.query;
+const handlerCallbackFromMal = async (request, h) => {
+  const { code } = request.payload;
 
-  // try {
-  //   axios(`${MAL_URI_TOKEN}?response_type=code&client_id?`)
-  // }
+  try {
+    const tokenFromMAL = await handlerGetToken(code);
+    const responseData = await handlerGetFullProfileMAL(tokenFromMAL.access_token);
+
+    const response = h.response({
+      status: 'Success',
+      message: 'Berhasil didapatkan',
+      responseData,
+    });
+    response.code(200);
+    return response;
+  } catch (err) {
+    const { data } = err.response;
+    console.error(`Ada yang error di try catch`, err.response.data);
+    const response = h.response({
+      status: data.error,
+      message: data.message,
+    });
+    response.code(err.response.status);
+    return response;
+  }
 };
 
 module.exports = {
