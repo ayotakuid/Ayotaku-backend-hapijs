@@ -7,7 +7,7 @@ const {
   GRANT_TYPE,
   MAL_URI_PROFILE,
 } = require('./secret.json');
-const { handlerSaveUsers } = require('../model/model-users');
+const { handlerSaveUsers, handlerUserByNameMAL } = require('../model/model-users');
 const { createTokenAdmin } = require('./handler-token');
 
 const handlerGetToken = async (code) => {
@@ -45,6 +45,7 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
     };
 
     const { data } = await axios.request(configAxios);
+    const checkingUsers = await handlerUserByNameMAL(data.name);
     const fields = {
       id_mal: data.id,
       name_mal: data.name,
@@ -52,6 +53,11 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
       token_mal: tokenMAL,
       role: 'user',
     };
+
+    if (checkingUsers !== null) {
+      return fields;
+    }
+
     const tokenAyotaku = createTokenAdmin(fields);
 
     await handlerSaveUsers(fields, tokenAyotaku);

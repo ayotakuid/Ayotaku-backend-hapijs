@@ -1,9 +1,10 @@
 const { nanoid } = require('nanoid');
 const { client, DB_NAME } = require('../db/config');
 
+const db = client.db(DB_NAME);
+const collection = db.collection('ayotaku_users');
+
 const handlerSaveUsers = async (newUser, tokenAyotaku) => {
-  const db = client.db(DB_NAME);
-  const collection = db.collection('ayotaku_users');
   const fieldCollection = {
     uuid: nanoid(16),
     id_mal: newUser?.id_mal,
@@ -27,6 +28,19 @@ const handlerSaveUsers = async (newUser, tokenAyotaku) => {
   }
 };
 
+const handlerUserByNameMAL = async (nameMAL) => {
+  try {
+    const user = await collection.findOne({
+      name_mal: nameMAL,
+    });
+    return user;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+};
+
 module.exports = {
   handlerSaveUsers,
+  handlerUserByNameMAL,
 };
