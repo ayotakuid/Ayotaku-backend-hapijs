@@ -13,7 +13,7 @@ const {
 const createToken = (user) => {
   const data = {
     id: 123,
-    username: user.username,
+    name_mal: user.username,
   };
 
   return JWT.sign(data, secretKey, {

@@ -7,6 +7,8 @@ const {
   GRANT_TYPE,
   MAL_URI_PROFILE,
 } = require('./secret.json');
+const { handlerSaveUsers } = require('../model/model-users');
+const { createTokenAdmin } = require('./handler-token');
 
 const handlerGetToken = async (code) => {
   try {
@@ -43,10 +45,18 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
     };
 
     const { data } = await axios.request(configAxios);
-    console.log(data);
-    return {
-      users: data,
+    const fields = {
+      id_mal: data.id,
+      name_mal: data.name,
+      img_profile: data.picture,
+      token_mal: tokenMAL,
+      role: 'user',
     };
+    const tokenAyotaku = createTokenAdmin(fields);
+
+    await handlerSaveUsers(fields, tokenAyotaku);
+
+    return fields;
   } catch (err) {
     console.error('Terjadi kesalahan saat GET Profile', err);
     return err;
