@@ -3,11 +3,14 @@ const HapiJWT2 = require('hapi-auth-jwt2');
 const routes = require('./routes');
 const { secretKey } = require('./src/utils/secret.json');
 const { connect } = require('./src/db/config');
+const { handlerUserByNameMAL } = require('./src/model/model-users');
 
 const validateToken = async (decoded, request, h) => {
-  const { username } = decoded;
+  const { name_mal } = decoded;
 
-  if (username !== 'Urusai') {
+  const user = await handlerUserByNameMAL(name_mal);
+
+  if (!user) {
     return {
       isValid: false,
     };
