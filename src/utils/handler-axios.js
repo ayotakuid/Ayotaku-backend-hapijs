@@ -7,7 +7,7 @@ const {
   GRANT_TYPE,
   MAL_URI_PROFILE,
 } = require('./secret.json');
-const { handlerSaveUsers, handlerUserByNameMAL } = require('../model/model-users');
+const { handlerSaveUsers, handlerUserByNameMAL, handlerUpdateLoginUsers } = require('../model/model-users');
 const { createTokenAdmin } = require('./handler-token');
 
 const handlerGetToken = async (code) => {
@@ -53,12 +53,13 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
       token_mal: tokenMAL,
       role: 'user',
     };
+    const tokenAyotaku = createTokenAdmin(fields);
 
     if (checkingUsers !== null) {
+      const updatelogin = await handlerUpdateLoginUsers(fields, tokenAyotaku);
+      console.log(updatelogin);
       return fields;
     }
-
-    const tokenAyotaku = createTokenAdmin(fields);
 
     await handlerSaveUsers(fields, tokenAyotaku);
 

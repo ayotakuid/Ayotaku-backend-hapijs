@@ -28,6 +28,27 @@ const handlerSaveUsers = async (newUser, tokenAyotaku) => {
   }
 };
 
+const handlerUpdateLoginUsers = async (dataUser, tokenAyotaku) => {
+  try {
+    const query = {
+      name_mal: dataUser.name_mal,
+    };
+
+    const dataUpdate = {
+      $set: {
+        timeLogin: new Date().toISOString(),
+        isLogin: true,
+        token: tokenAyotaku,
+        token_mal: dataUser.token_mal,
+      },
+    };
+    const updateUsersLogin = collection.updateOne(query, dataUpdate);
+    return updateUsersLogin;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 const handlerUserByNameMAL = async (nameMAL) => {
   try {
     const user = await collection.findOne({
@@ -43,4 +64,5 @@ const handlerUserByNameMAL = async (nameMAL) => {
 module.exports = {
   handlerSaveUsers,
   handlerUserByNameMAL,
+  handlerUpdateLoginUsers,
 };
