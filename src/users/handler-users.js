@@ -6,7 +6,8 @@ const {
   handlerGetToken,
   handlerGetFullProfileMAL,
 } = require('../utils/handler-axios');
-const { handlerUserByNameMAL } = require('../model/model-users');
+const { handlerUserByNameMAL, handlerUpdateSignOutUsers } = require('../model/model-users');
+const { refreshTokenAdmin } = require('../utils/handler-token');
 
 const handlerCallbackFromMal = async (request, h) => {
   const { code } = request.payload;
@@ -61,6 +62,25 @@ const checkingTokenExp = async (request, h) => {
       message: 'Token tidak expired!',
       data: credentialsUser,
     }).code(200);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const handlerSignOutAdmin = async (request, h) => {
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUser.name_mal);
+    const fields = {
+      id_mal: userFind?.id_mal,
+      name_mal: userFind?.name_mal,
+      role: userFind?.role,
+    };
+    const refreshToken = refreshTokenAdmin(fields);
+    const updateSignOut = await handlerUpdateSignOutUsers(userFind.name_mal, refreshToken);
   } catch (err) {
     console.error(err);
   }

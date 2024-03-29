@@ -7,7 +7,11 @@ const {
   GRANT_TYPE,
   MAL_URI_PROFILE,
 } = require('./secret.json');
-const { handlerSaveUsers, handlerUserByNameMAL, handlerUpdateLoginUsers } = require('../model/model-users');
+const {
+  handlerSaveUsers,
+  handlerUserByNameMAL,
+  handlerUpdateLoginUsers,
+} = require('../model/model-users');
 const { createTokenAdmin } = require('./handler-token');
 
 const handlerGetToken = async (code) => {
@@ -57,13 +61,21 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
 
     if (checkingUsers !== null) {
       const updatelogin = await handlerUpdateLoginUsers(fields, tokenAyotaku);
+      const responseData = {
+        ...fields,
+        tokenAyotaku,
+      };
       console.log(updatelogin);
-      return fields;
+      return responseData;
     }
 
     await handlerSaveUsers(fields, tokenAyotaku);
+    const responseData = {
+      ...fields,
+      tokenAyotaku,
+    };
 
-    return fields;
+    return responseData;
   } catch (err) {
     console.error('Terjadi kesalahan saat GET Profile', err);
     return err;

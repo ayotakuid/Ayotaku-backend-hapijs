@@ -15,6 +15,19 @@ const createTokenAdmin = (dataToken) => {
   });
 };
 
+const refreshTokenAdmin = (dataToken) => {
+  const data = {
+    id_mal: '',
+    name_mal: '',
+    role: '',
+  };
+
+  return JWT.sign(data, secretKey, {
+    expiresIn: '5s',
+  });
+};
+
 module.exports = {
   createTokenAdmin,
+  refreshTokenAdmin,
 };
