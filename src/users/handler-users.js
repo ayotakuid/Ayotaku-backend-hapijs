@@ -69,8 +69,6 @@ const checkingTokenExp = async (request, h) => {
 
 const handlerSignOutAdmin = async (request, h) => {
   const credentialsUser = request.auth.credentials;
-  const tokenUser = request.headers.authorization;
-  const tokenSplit = tokenUser.split(' ');
 
   try {
     const userFind = await handlerUserByNameMAL(credentialsUser.name_mal);
@@ -80,13 +78,32 @@ const handlerSignOutAdmin = async (request, h) => {
       role: userFind?.role,
     };
     const refreshToken = refreshTokenAdmin(fields);
-    const updateSignOut = await handlerUpdateSignOutUsers(userFind.name_mal, refreshToken);
+    const updateSignOut = await handlerUpdateSignOutUsers(fields, refreshToken);
+
+    if (updateSignOut.matchedCount !== 1) {
+      return h.response({
+        status: 'fail',
+        message: 'Data tidak di temukan',
+      }).code(400);
+    }
+    const response = h.response({
+      status: 'success',
+      message: 'Data berhasil diedit',
+    });
+    response.code(200);
+    return response;
   } catch (err) {
     console.error(err);
+    throw err;
   }
+};
+
+const handlerGetProfileUser = async (request, h) => {
+  const credentialsUser = request.auth.credentials;
 };
 
 module.exports = {
   handlerCallbackFromMal,
   checkingTokenExp,
+  handlerSignOutAdmin,
 };

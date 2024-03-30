@@ -52,7 +52,7 @@ const handlerUpdateLoginUsers = async (dataUser, tokenAyotaku) => {
 const handlerUpdateSignOutUsers = async (dataUser, refreshToken) => {
   try {
     const query = {
-      name_mal: dataUser.name_mal,
+      name_mal: dataUser?.name_mal,
     };
 
     const dataUpdate = {
