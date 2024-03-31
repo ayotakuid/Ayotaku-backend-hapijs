@@ -7,7 +7,7 @@ const {
   handlerGetFullProfileMAL,
 } = require('../utils/handler-axios');
 const { handlerUserByNameMAL, handlerUpdateSignOutUsers } = require('../model/model-users');
-const { refreshTokenAdmin } = require('../utils/handler-token');
+const { refreshTokenAdmin, checkingTokenForAll } = require('../utils/handler-token');
 
 const handlerCallbackFromMal = async (request, h) => {
   const { code } = request.payload;
@@ -100,10 +100,40 @@ const handlerSignOutAdmin = async (request, h) => {
 
 const handlerGetProfileUser = async (request, h) => {
   const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUser?.name_mal);
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    return h.response({
+      status: 'success',
+      message: 'Profile berhasil diambil!',
+      data: {
+        id_mal: userFind?.id_mal,
+        name_mal: userFind?.name_mal,
+        img_profile: userFind?.img_profile,
+        isLogin: userFind?.isLogin,
+        timeLogin: userFind?.timeLogin,
+        role: userFind?.role,
+      },
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 };
 
 module.exports = {
   handlerCallbackFromMal,
   checkingTokenExp,
   handlerSignOutAdmin,
+  handlerGetProfileUser,
 };

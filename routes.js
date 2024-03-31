@@ -2,6 +2,7 @@ const {
   handlerCallbackFromMal,
   checkingTokenExp,
   handlerSignOutAdmin,
+  handlerGetProfileUser,
 } = require("./src/users/handler-users");
 
 const routes = [
@@ -27,6 +28,15 @@ const routes = [
     method: 'POST',
     path: '/api/admin/signout',
     handler: handlerSignOutAdmin,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/admin/profile',
+    handler: handlerGetProfileUser,
     options: {
       auth: 'jwt',
       cors: true,
