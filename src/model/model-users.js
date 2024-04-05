@@ -80,9 +80,20 @@ const handlerUserByNameMAL = async (nameMAL) => {
   }
 };
 
+const handlerGetAllUser = async () => {
+  try {
+    const user = collection.find().toArray();
+    return user;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveUsers,
   handlerUserByNameMAL,
   handlerUpdateLoginUsers,
   handlerUpdateSignOutUsers,
+  handlerGetAllUser,
 };

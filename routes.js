@@ -4,6 +4,7 @@ const {
   handlerSignOutAdmin,
   handlerGetProfileUser,
 } = require("./src/users/handler-users");
+const { handlerTotalUser } = require("./src/users/handler-total");
 
 const routes = [
   {
@@ -37,6 +38,15 @@ const routes = [
     method: 'GET',
     path: '/api/admin/profile',
     handler: handlerGetProfileUser,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/admin/total-all',
+    handler: handlerTotalUser,
     options: {
       auth: 'jwt',
       cors: true,
