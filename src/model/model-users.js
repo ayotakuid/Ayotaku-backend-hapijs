@@ -90,10 +90,23 @@ const handlerGetAllUser = async () => {
   }
 };
 
+const handlerGetOnlineUser = async () => {
+  try {
+    const user = collection.find({
+      isLogin: true,
+    }).toArray();
+    return user;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveUsers,
   handlerUserByNameMAL,
   handlerUpdateLoginUsers,
   handlerUpdateSignOutUsers,
   handlerGetAllUser,
+  handlerGetOnlineUser,
 };
