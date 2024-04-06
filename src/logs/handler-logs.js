@@ -1,16 +1,12 @@
+const { handlerGetAllLogs } = require("../model/model-logs");
 const { checkingTokenForAll } = require("../utils/handler-token");
-const {
-  handlerGetAllUser,
-  handlerGetOnlineUser,
-} = require("../model/model-users");
 
-const handlerTotalUser = async (request, h) => {
+const handlerLogs = async (request, h) => {
   const credentialsUser = request.auth.credentials;
   const tokenUser = request.headers.authorization;
 
   try {
-    const allUser = await handlerGetAllUser();
-    const onlineUser = await handlerGetOnlineUser();
+    const allLogs = await handlerGetAllLogs();
     const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
 
     if (isExpired !== true) {
@@ -23,10 +19,7 @@ const handlerTotalUser = async (request, h) => {
     return h.response({
       status: 'success',
       message: 'Total User',
-      data: {
-        totalUser: allUser.length,
-        onlineUser: onlineUser.length,
-      },
+      data: allLogs,
     }).code(200);
   } catch (err) {
     console.error(err);
@@ -35,5 +28,5 @@ const handlerTotalUser = async (request, h) => {
 };
 
 module.exports = {
-  handlerTotalUser,
+  handlerLogs,
 };

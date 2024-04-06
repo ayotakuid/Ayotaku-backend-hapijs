@@ -23,7 +23,10 @@ const fieldCollection = (data, typeLogs) => {
   if (typeLogs === 'signup') {
     return {
       uuid: nanoid(16),
-      user: data,
+      user: {
+        id_mal: data?.id_mal,
+        name_mal: data?.name_mal,
+      },
       text: textType,
       type: typeLogs,
       date: new Date().toISOString(),
@@ -49,6 +52,17 @@ const handlerSaveLogsUser = async (data, typeLogs) => {
   }
 };
 
+const handlerGetAllLogs = async () => {
+  try {
+    const userLogs = collection.find().toArray();
+    return userLogs;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveLogsUser,
+  handlerGetAllLogs,
 };
