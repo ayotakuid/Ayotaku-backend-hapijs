@@ -13,6 +13,7 @@ const {
   handlerUpdateLoginUsers,
 } = require('../model/model-users');
 const { createTokenAdmin } = require('./handler-token');
+const { handlerSaveLogsUser } = require('../model/model-logs');
 
 const handlerGetToken = async (code) => {
   try {
@@ -61,6 +62,7 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
 
     if (checkingUsers !== null) {
       const updatelogin = await handlerUpdateLoginUsers(fields, tokenAyotaku);
+      await handlerSaveLogsUser(checkingUsers, 'signin-admin');
       const responseData = {
         ...fields,
         tokenAyotaku,
@@ -70,6 +72,7 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
     }
 
     await handlerSaveUsers(fields, tokenAyotaku);
+    await handlerSaveLogsUser(fields, 'signup');
     const responseData = {
       ...fields,
       tokenAyotaku,

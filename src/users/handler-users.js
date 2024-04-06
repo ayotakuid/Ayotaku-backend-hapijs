@@ -8,6 +8,7 @@ const {
 } = require('../utils/handler-axios');
 const { handlerUserByNameMAL, handlerUpdateSignOutUsers } = require('../model/model-users');
 const { refreshTokenAdmin, checkingTokenForAll } = require('../utils/handler-token');
+const { handlerSaveLogsUser } = require('../model/model-logs');
 
 const handlerCallbackFromMal = async (request, h) => {
   const { code } = request.payload;
@@ -79,6 +80,7 @@ const handlerSignOutAdmin = async (request, h) => {
     };
     const refreshToken = refreshTokenAdmin(fields);
     const updateSignOut = await handlerUpdateSignOutUsers(fields, refreshToken);
+    await handlerSaveLogsUser(userFind, 'signout-admin');
 
     if (updateSignOut.matchedCount !== 1) {
       return h.response({
