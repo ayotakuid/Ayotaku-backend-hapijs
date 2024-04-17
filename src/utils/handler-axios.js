@@ -6,6 +6,8 @@ const {
   CODE_VERIFIER,
   GRANT_TYPE,
   MAL_URI_PROFILE,
+  ANIME_SCHEDULE_URI,
+  ANIME_SCHEDULE_TOKEN,
 } = require('./secret.json');
 const {
   handlerSaveUsers,
@@ -85,7 +87,45 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
   }
 };
 
+const handlerFethcingScheduleWeek = async () => {
+  const headersSChedule = new Headers();
+  headersSChedule.append("Content-Type", "application/json");
+  headersSChedule.append("Authorization", `Bearer ${ANIME_SCHEDULE_TOKEN}`);
+
+  const requestOptions = {
+    method: "GET",
+    headers: headersSChedule,
+    redirect: "follow",
+  };
+
+  try {
+    const scheduleWeeks = await fetch(`${ANIME_SCHEDULE_URI}/timetables/sub?tz=Asia/Jakarta`, requestOptions);
+    const result = await scheduleWeeks.json();
+    const daysNames = [
+      "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
+    ];
+    const groups = {};
+
+    result.forEach((anime) => {
+      const date = new Date(anime.episodeDate);
+      const dayName = daysNames[date.getDay()];
+
+      if (!groups[dayName]) {
+        groups[dayName] = [];
+      }
+
+      groups[dayName].push(anime);
+    });
+
+    return groups;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerGetToken,
   handlerGetFullProfileMAL,
+  handlerFethcingScheduleWeek,
 };
