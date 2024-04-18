@@ -6,6 +6,7 @@ const {
   CODE_VERIFIER,
   GRANT_TYPE,
   MAL_URI_PROFILE,
+  MAL_API_URI,
   ANIME_SCHEDULE_URI,
   ANIME_SCHEDULE_TOKEN,
 } = require('./secret.json');
@@ -124,8 +125,30 @@ const handlerFethcingScheduleWeek = async () => {
   }
 };
 
+const handlerFetchingSearchAnime = async (tokenMal, nameAnime) => {
+  const headersSearchAnime = new Headers();
+  headersSearchAnime.append("Content-Type", "application/json");
+  headersSearchAnime.append("Authorization", `Bearer ${tokenMal}`);
+
+  const requestOptions = {
+    method: "GET",
+    headers: headersSearchAnime,
+    redirect: "follow",
+  };
+
+  try {
+    const searchAnime = await fetch(`${MAL_API_URI}/anime?q=${nameAnime}`, requestOptions);
+    const result = await searchAnime.json();
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerGetToken,
   handlerGetFullProfileMAL,
   handlerFethcingScheduleWeek,
+  handlerFetchingSearchAnime,
 };

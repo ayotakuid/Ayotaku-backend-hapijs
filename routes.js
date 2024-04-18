@@ -7,6 +7,7 @@ const {
 const { handlerTotalUser } = require("./src/users/handler-total");
 const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
+const { handlerSearchAnime } = require("./src/anime/handler-search");
 
 const routes = [
   {
@@ -69,6 +70,15 @@ const routes = [
     handler: handlerFethcingScheduleWeek,
     options: {
       auth: false,
+      cors: true,
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/anime/search',
+    handler: handlerSearchAnime,
+    options: {
+      auth: 'jwt',
       cors: true,
     },
   },
