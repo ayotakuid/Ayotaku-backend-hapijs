@@ -137,7 +137,7 @@ const handlerFetchingSearchAnime = async (tokenMal, nameAnime) => {
   };
 
   try {
-    const searchAnime = await fetch(`${MAL_API_URI}/anime?q=${nameAnime}`, requestOptions);
+    const searchAnime = await fetch(`${MAL_API_URI}/anime?q=${nameAnime}&nsfw=true`, requestOptions);
     const result = await searchAnime.json();
     return result;
   } catch (err) {
