@@ -9,6 +9,8 @@ const {
   MAL_API_URI,
   ANIME_SCHEDULE_URI,
   ANIME_SCHEDULE_TOKEN,
+  FIELDS_DETAIL_ANIME,
+  JIKAN_API_URI,
 } = require('./secret.json');
 const {
   handlerSaveUsers,
@@ -146,9 +148,52 @@ const handlerFetchingSearchAnime = async (tokenMal, nameAnime) => {
   }
 };
 
+const handlerFetchingDetailAnime = async (tokenMal, id) => {
+  const headersDetailAnime = new Headers();
+  headersDetailAnime.append("Content-Type", "application/json");
+  headersDetailAnime.append("Authorization", `Bearer ${tokenMal}`);
+
+  const requestOptions = {
+    method: 'GET',
+    headers: headersDetailAnime,
+    redirect: "follow",
+  };
+
+  try {
+    const detailAnime = await fetch(`${MAL_API_URI}/anime/${id}?fields=${FIELDS_DETAIL_ANIME}`, requestOptions);
+    const result = await detailAnime.json();
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerFetchingAnimeVideoJikan = async (id) => {
+  const headerVideoJikan = new Headers();
+  headerVideoJikan.append("Content-Type", "application/json");
+
+  const requestOptions = {
+    method: 'GET',
+    headers: headerVideoJikan,
+    redirect: "follow",
+  };
+
+  try {
+    const animeVideo = await fetch(`${JIKAN_API_URI}/anime/${id}/videos`, requestOptions);
+    const result = await animeVideo.json();
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerGetToken,
   handlerGetFullProfileMAL,
   handlerFethcingScheduleWeek,
   handlerFetchingSearchAnime,
+  handlerFetchingDetailAnime,
+  handlerFetchingAnimeVideoJikan,
 };
