@@ -17,6 +17,7 @@
       "no-underscore-dangle": "off",
       "max-len": "off",
       "consistent-return": "off",
-      "camelcase": "off"
+      "camelcase": "off",
+      "no-useless-escape": "off"
     }
 }
