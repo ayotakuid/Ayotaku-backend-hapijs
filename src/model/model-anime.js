@@ -7,7 +7,7 @@ const collection = db.collection('ayotaku_animes');
 const createSlugAnime = (title) => {
   const changeTitle = title.replace(/ /g, "-").toLowerCase();
   const removeSpecial = changeTitle.replace(/[^\w\s.\-]/g, "");
-  return `${removeSpecial}-${new Date().getTime()};`;
+  return `${removeSpecial}-${new Date().getTime()}`;
 };
 
 const handlerSaveAnime = async (data, admin) => {
