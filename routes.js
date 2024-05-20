@@ -9,6 +9,7 @@ const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime } = require("./src/anime/handler-search");
 const { handlerCreateAnime } = require("./src/anime/handler-create");
+const { handlerShowAllAnime } = require("./src/anime/handler-show");
 
 const routes = [
   {
@@ -96,6 +97,15 @@ const routes = [
     method: 'POST',
     path: '/api/anime/create',
     handler: handlerCreateAnime,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/anime/all',
+    handler: handlerShowAllAnime,
     options: {
       auth: 'jwt',
       cors: true,

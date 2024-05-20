@@ -41,7 +41,18 @@ const handlerCheckingAnime = async (id) => {
   }
 };
 
+const handlerModelShowAnime = async (request, h) => {
+  try {
+    const getAllAnime = await collection.find().toArray();
+    return getAllAnime;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
+  handlerModelShowAnime,
 };
