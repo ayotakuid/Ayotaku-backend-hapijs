@@ -43,7 +43,7 @@ const handlerCheckingAnime = async (id) => {
 
 const handlerModelShowAnime = async (request, h) => {
   try {
-    const getAllAnime = await collection.find().toArray();
+    const getAllAnime = await collection.find().sort({ created_at: -1 }).toArray();
     return getAllAnime;
   } catch (err) {
     console.error(err);
