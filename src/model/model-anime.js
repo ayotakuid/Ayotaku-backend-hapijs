@@ -43,7 +43,37 @@ const handlerCheckingAnime = async (id) => {
 
 const handlerModelShowAnime = async (request, h) => {
   try {
-    const getAllAnime = await collection.find().sort({ created_at: -1 }).toArray();
+    const pipeLine = [
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $sort: {
+          created_at: -1,
+        },
+      },
+    ];
+
+    const getAllAnime = await collection.aggregate(pipeLine).toArray();
     return getAllAnime;
   } catch (err) {
     console.error(err);
