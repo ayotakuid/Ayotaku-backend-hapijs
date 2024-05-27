@@ -21,6 +21,8 @@ const handlerSaveAnime = async (data, admin) => {
       data,
       created_at: created,
       updated_at: created,
+      isDeleted: false,
+      deleted_at: null,
     });
     return result;
   } catch (err) {
@@ -41,9 +43,14 @@ const handlerCheckingAnime = async (id) => {
   }
 };
 
-const handlerModelShowAnime = async (request, h) => {
+const handlerModelShowAnime = async () => {
   try {
     const pipeLine = [
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
       {
         $lookup: {
           from: 'ayotaku_users',
@@ -81,8 +88,66 @@ const handlerModelShowAnime = async (request, h) => {
   }
 };
 
+const handlerModelSoftDelete = async (animeUuid) => {
+  try {
+    const query = {
+      uuid: animeUuid,
+    };
+
+    const dataUpdate = {
+      $set: {
+        isDeleted: true,
+        deleted_at: new Date().toISOString(),
+      },
+    };
+
+    const pipeLineAggregate = [
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $sort: {
+          created_at: -1,
+        },
+      },
+    ];
+
+    const softDeleteAnime = await collection.updateOne(query, dataUpdate);
+    const returnData = await collection.aggregate(pipeLineAggregate).toArray();
+    return returnData;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
   handlerModelShowAnime,
+  handlerModelSoftDelete,
 };
