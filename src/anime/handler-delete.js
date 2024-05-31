@@ -23,7 +23,7 @@ const handlerSoftDeleteByUuid = async (request, h) => {
 
     if (softDelete.modifiedCount === 0) {
       return h.response({
-        status: 'failed',
+        status: 'fail',
         message: 'UUID Tidak ada yang cocok',
       }).code(404);
     }
