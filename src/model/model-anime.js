@@ -145,9 +145,55 @@ const handlerModelSoftDelete = async (animeUuid) => {
   }
 };
 
+const handlerModelShowAnimeDelete = async () => {
+  try {
+    const pipeLine = [
+      {
+        $match: {
+          isDeleted: true,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $sort: {
+          deleted_at: -1,
+        },
+      },
+    ];
+
+    const showAnimeDelete = await collection.aggregate(pipeLine).toArray();
+    return showAnimeDelete;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
   handlerModelShowAnime,
   handlerModelSoftDelete,
+  handlerModelShowAnimeDelete,
 };

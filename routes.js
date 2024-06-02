@@ -9,7 +9,7 @@ const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime } = require("./src/anime/handler-search");
 const { handlerCreateAnime } = require("./src/anime/handler-create");
-const { handlerShowAllAnime } = require("./src/anime/handler-show");
+const { handlerShowAllAnime, handlerShowDeleteAnime } = require("./src/anime/handler-show");
 const { handlerSoftDeleteByUuid } = require("./src/anime/handler-delete");
 
 const routes = [
@@ -116,6 +116,15 @@ const routes = [
     method: 'DELETE',
     path: '/api/anime/delete',
     handler: handlerSoftDeleteByUuid,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/anime/all/delete',
+    handler: handlerShowDeleteAnime,
     options: {
       auth: 'jwt',
       cors: true,
