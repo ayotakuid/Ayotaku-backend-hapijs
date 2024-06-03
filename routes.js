@@ -10,7 +10,7 @@ const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime } = require("./src/anime/handler-search");
 const { handlerCreateAnime } = require("./src/anime/handler-create");
 const { handlerShowAllAnime, handlerShowDeleteAnime } = require("./src/anime/handler-show");
-const { handlerSoftDeleteByUuid } = require("./src/anime/handler-delete");
+const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
 
 const routes = [
   {
@@ -125,6 +125,15 @@ const routes = [
     method: 'GET',
     path: '/api/anime/all/delete',
     handler: handlerShowDeleteAnime,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/api/anime/recovery',
+    handler: handlerRecoveryAnime,
     options: {
       auth: 'jwt',
       cors: true,
