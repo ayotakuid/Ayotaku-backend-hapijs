@@ -247,6 +247,66 @@ const handlerModelRecoveryAnime = async (animeUuid) => {
   }
 };
 
+const handlerModelSyncAnime = async (animeUuid, dataUpdated) => {
+  try {
+    const query = {
+      uuid: animeUuid,
+    };
+
+    const dataUpdate = {
+      $set: {
+        'data.start_date': dataUpdated?.start_date,
+        'data.end_date': dataUpdated?.end_date,
+        'data.rating': dataUpdated?.rating,
+        'data.status': dataUpdated?.status,
+      },
+    };
+
+    const pipeLineSync = [
+      {
+        $match: {
+          uuid: animeUuid,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $sort: {
+          deleted_at: -1,
+        },
+      },
+    ];
+
+    const updateData = await collection.updateOne(query, dataUpdate);
+    const returnData = await collection.aggregate(pipeLineSync).toArray();
+    console.log(returnData);
+    return returnData;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -254,4 +314,5 @@ module.exports = {
   handlerModelSoftDelete,
   handlerModelShowAnimeDelete,
   handlerModelRecoveryAnime,
+  handlerModelSyncAnime,
 };
