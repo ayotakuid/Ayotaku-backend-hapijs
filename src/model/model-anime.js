@@ -299,7 +299,6 @@ const handlerModelSyncAnime = async (animeUuid, dataUpdated) => {
 
     const updateData = await collection.updateOne(query, dataUpdate);
     const returnData = await collection.aggregate(pipeLineSync).toArray();
-    console.log(returnData);
     return returnData;
   } catch (err) {
     console.error(err);
