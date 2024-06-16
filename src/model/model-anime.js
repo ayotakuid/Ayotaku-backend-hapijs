@@ -306,6 +306,63 @@ const handlerModelSyncAnime = async (animeUuid, dataUpdated) => {
   }
 };
 
+const handlerModelManualEditAnime = async (animeUuid, dataUpdated) => {
+  try {
+    const query = {
+      uuid: animeUuid,
+    };
+
+    const dataUpdate = {
+      $set: {
+        'data.foto_anime': dataUpdated?.image,
+        'data.video': dataUpdated?.video,
+      },
+    };
+
+    const pipeLineSync = [
+      {
+        $match: {
+          uuid: animeUuid,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $sort: {
+          deleted_at: -1,
+        },
+      },
+    ];
+
+    const updateData = await collection.updateOne(query, dataUpdate);
+    const returnData = await collection.aggregate(pipeLineSync).toArray();
+    return returnData;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -314,4 +371,5 @@ module.exports = {
   handlerModelShowAnimeDelete,
   handlerModelRecoveryAnime,
   handlerModelSyncAnime,
+  handlerModelManualEditAnime,
 };

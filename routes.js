@@ -8,7 +8,7 @@ const { handlerTotalUser } = require("./src/users/handler-total");
 const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime } = require("./src/anime/handler-search");
-const { handlerCreateAnime } = require("./src/anime/handler-create");
+const { handlerCreateAnime, handlerManualEditAnime } = require("./src/anime/handler-create");
 const { handlerShowAllAnime, handlerShowDeleteAnime, handlerSyncAnime } = require("./src/anime/handler-show");
 const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
 
@@ -143,6 +143,15 @@ const routes = [
     method: 'PUT',
     path: '/api/anime/sync-anime',
     handler: handlerSyncAnime,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/api/anime/manual-edit',
+    handler: handlerManualEditAnime,
     options: {
       auth: 'jwt',
       cors: true,
