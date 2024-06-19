@@ -68,6 +68,13 @@ const handlerSyncAnime = async (request, h) => {
     const userFind = await handlerUserByNameMAL(credentialsUser?.name_mal);
     const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
 
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
     const responseDetailAnime = await handlerFetchingDetailAnime(userFind?.token_mal, animeIdMal);
     const allDataNeeded = {
       start_date: responseDetailAnime?.start_date,
