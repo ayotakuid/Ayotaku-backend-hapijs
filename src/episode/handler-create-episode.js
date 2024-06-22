@@ -28,21 +28,21 @@ const handlerCreateEpisode = async (request, h) => {
       return h.response({
         status: 'fail',
         message: 'Tolong isi semua field',
-      }).code(401);
+      }).code(422);
     }
 
     if (!data?.uuidAdmin) {
       return h.response({
         status: 'fail',
         message: 'Tolong isi semua field',
-      }).code(401);
+      }).code(422);
     }
 
     if (!data?.episode) {
       return h.response({
         status: 'fail',
         message: 'Tolong isi semua field',
-      }).code(401);
+      }).code(422);
     }
 
     const allDataNeeded = {
@@ -67,7 +67,8 @@ const handlerCreateEpisode = async (request, h) => {
       data: insertEpisode,
     }).code(200);
   } catch (err) {
-    console.error();
+    console.error(err);
+    throw err;
   }
 };
 
