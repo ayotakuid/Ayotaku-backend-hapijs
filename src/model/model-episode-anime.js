@@ -40,6 +40,74 @@ const modelSaveEpisode = async (data) => {
   }
 };
 
+const modelShowEpisode = async () => {
+  try {
+    const pipeLine = [
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_animes',
+          localField: 'id_anime',
+          foreignField: 'uuid',
+          as: 'anime',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $unwind: '$anime',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $addFields: {
+          animes: {
+            id_anime: '$anime.uuid',
+            judul_anime: '$anime.data.nama_anime.romanji',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $unset: 'anime',
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ];
+
+    const getAllEpisode = await collection.aggregate(pipeLine).toArray();
+    return getAllEpisode;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   modelSaveEpisode,
+  modelShowEpisode,
 };
