@@ -107,7 +107,87 @@ const modelShowEpisode = async () => {
   }
 };
 
+const modelSoftDeleteEpisode = async (episodeUuid) => {
+  try {
+    const query = {
+      uuid: episodeUuid,
+    };
+
+    const dataUpdate = {
+      $set: {
+        isDeleted: true,
+        deletedAt: new Date().toISOString(),
+      },
+    };
+
+    const pipeLineAggregate = [
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_users',
+          localField: 'id_admin',
+          foreignField: 'id_mal',
+          as: 'admin',
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_animes',
+          localField: 'id_anime',
+          foreignField: 'uuid',
+          as: 'anime',
+        },
+      },
+      {
+        $unwind: '$admin',
+      },
+      {
+        $unwind: '$anime',
+      },
+      {
+        $addFields: {
+          whois: {
+            id_admin: '$admin.id_mal',
+            username_mal: '$admin.name_mal',
+          },
+        },
+      },
+      {
+        $addFields: {
+          animes: {
+            id_anime: '$anime.uuid',
+            judul_anime: '$anime.data.nama_anime.romanji',
+          },
+        },
+      },
+      {
+        $unset: 'admin',
+      },
+      {
+        $unset: 'anime',
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ];
+
+    const softDeleteEpisode = await collection.updateOne(query, dataUpdate);
+    const returnData = await collection.aggregate(pipeLineAggregate).toArray();
+    return returnData;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   modelSaveEpisode,
   modelShowEpisode,
+  modelSoftDeleteEpisode,
 };

@@ -13,6 +13,7 @@ const { handlerShowAllAnime, handlerShowDeleteAnime, handlerSyncAnime } = requir
 const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
 const { handlerCreateEpisode } = require("./src/episode/handler-create-episode");
 const { handlerShowAllEpisode } = require("./src/episode/handler-show-episode");
+const { handlerSoftDeleteEpisode } = require("./src/episode/handler-episode-delete");
 
 const routes = [
   {
@@ -172,6 +173,15 @@ const routes = [
     method: 'GET',
     path: '/api/anime/episode/all',
     handler: handlerShowAllEpisode,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/api/anime/episode/delete',
+    handler: handlerSoftDeleteEpisode,
     options: {
       auth: 'jwt',
       cors: true,
