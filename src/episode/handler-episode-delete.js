@@ -1,4 +1,4 @@
-const { modelSoftDeleteEpisode } = require("../model/model-episode-anime");
+const { modelSoftDeleteEpisode, modelShowEpisodeDelete } = require("../model/model-episode-anime");
 const { handlerUserByNameMAL } = require("../model/model-users");
 const { checkingTokenForAll } = require("../utils/handler-token");
 
@@ -9,7 +9,6 @@ const handlerSoftDeleteEpisode = async (request, h) => {
   const tokenSplit = tokenUser.split(' ');
 
   try {
-    const userFind = await handlerUserByNameMAL(credentialsUser.name_mal);
     const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
 
     if (isExpired !== true) {
@@ -39,6 +38,34 @@ const handlerSoftDeleteEpisode = async (request, h) => {
   }
 };
 
+const handlerShowDeleteEpisode = async (request, h) => {
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (!isExpired) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    const showEpisodeDelete = await modelShowEpisodeDelete();
+    return h.response({
+      status: 'success',
+      message: `${showEpisodeDelete.length} episode anime berhasil diambil!`,
+      data: showEpisodeDelete,
+    }).code(200);
+  } catch (err) {
+    console.error('Error Show Delete Episode: ', err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSoftDeleteEpisode,
+  handlerShowDeleteEpisode,
 };
