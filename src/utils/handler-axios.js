@@ -103,25 +103,33 @@ const handlerFethcingScheduleWeek = async () => {
 
   try {
     const scheduleWeeks = await fetch(`${ANIME_SCHEDULE_URI}/timetables/sub?tz=Asia/Jakarta`, requestOptions);
-    const result = await scheduleWeeks.json();
-    const daysNames = [
-      "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
-    ];
-    const groups = {};
 
-    result.forEach((anime) => {
-      const date = new Date(anime.episodeDate);
-      const dayName = daysNames[date.getDay()];
+    if (scheduleWeeks.ok) {
+      const result = await scheduleWeeks.json();
+      const daysNames = [
+        "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
+      ];
+      const groups = {};
 
-      if (!groups[dayName]) {
-        groups[dayName] = [];
-      }
+      result.forEach((anime) => {
+        const date = new Date(anime.episodeDate);
+        const dayName = daysNames[date.getDay()];
 
-      groups[dayName].push(anime);
-    });
+        if (!groups[dayName]) {
+          groups[dayName] = [];
+        }
 
-    return groups;
+        groups[dayName].push(anime);
+      });
+
+      return groups;
+    }
+
+    return {
+      message: 'Schedule Error!',
+    };
   } catch (err) {
+    console.log('Error disini');
     console.error(err);
     throw err;
   }
