@@ -1,5 +1,4 @@
-const { modelSoftDeleteEpisode, modelShowEpisodeDelete } = require("../model/model-episode-anime");
-const { handlerUserByNameMAL } = require("../model/model-users");
+const { modelSoftDeleteEpisode, modelShowEpisodeDelete, modelRecoveryEpisode } = require("../model/model-episode-anime");
 const { checkingTokenForAll } = require("../utils/handler-token");
 
 const handlerSoftDeleteEpisode = async (request, h) => {
@@ -65,7 +64,44 @@ const handlerShowDeleteEpisode = async (request, h) => {
   }
 };
 
+const handlerRecoveryEpisode = async (request, h) => {
+  const { episodeUuid } = request.payload;
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (!isExpired) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    const recoverEpisode = await modelRecoveryEpisode(episodeUuid);
+
+    if (recoverEpisode.modifiedCount === 0) {
+      return h.response({
+        status: 'fail',
+        message: 'UUID Episode tidak ada yang cocok',
+      }).code(404);
+    }
+
+    return h.response({
+      status: 'success',
+      message: 'Berhasil di recovery',
+      data: recoverEpisode,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSoftDeleteEpisode,
   handlerShowDeleteEpisode,
+  handlerRecoveryEpisode,
 };
