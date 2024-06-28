@@ -240,7 +240,7 @@ const modelShowEpisodeDelete = async () => {
       },
       {
         $sort: {
-          createdAt: -1,
+          deletedAt: -1,
         },
       },
     ];
