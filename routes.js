@@ -11,7 +11,7 @@ const { handlerSearchAnime, handlerDetailAnime } = require("./src/anime/handler-
 const { handlerCreateAnime, handlerManualEditAnime } = require("./src/anime/handler-create");
 const { handlerShowAllAnime, handlerShowDeleteAnime, handlerSyncAnime } = require("./src/anime/handler-show");
 const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
-const { handlerCreateEpisode } = require("./src/episode/handler-create-episode");
+const { handlerCreateEpisode, handlerEditEpisode } = require("./src/episode/handler-create-episode");
 const { handlerShowAllEpisode } = require("./src/episode/handler-show-episode");
 const { handlerSoftDeleteEpisode, handlerShowDeleteEpisode, handlerRecoveryEpisode } = require("./src/episode/handler-episode-delete");
 
@@ -200,6 +200,15 @@ const routes = [
     method: 'PUT',
     path: '/api/anime/episode/recovery',
     handler: handlerRecoveryEpisode,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/api/anime/episode/edit',
+    handler: handlerEditEpisode,
     options: {
       auth: 'jwt',
       cors: true,

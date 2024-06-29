@@ -1,11 +1,7 @@
 const { handlerUserByNameMAL } = require('../model/model-users');
 const { checkingTokenForAll } = require('../utils/handler-token');
-const { modelSaveEpisode } = require('../model/model-episode-anime');
-
-const createSlugEpisode = (episode) => {
-  const changeEpisode = episode.replace(/ /g, "-").toLowerCase();
-  return `${changeEpisode}-${new Date().getTime()}`;
-};
+const { modelSaveEpisode, modelEditEpisode } = require('../model/model-episode-anime');
+const { createSlugEpisode } = require('../utils/handler-slug');
 
 const handlerCreateEpisode = async (request, h) => {
   const data = request.payload;
@@ -72,6 +68,35 @@ const handlerCreateEpisode = async (request, h) => {
   }
 };
 
+const handlerEditEpisode = async (request, h) => {
+  const { episodeUuid, dataEpisode, checkingEpisode } = request.payload;
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (!isExpired) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    const responseModelUpdate = await modelEditEpisode(episodeUuid, dataEpisode, checkingEpisode);
+    return h.response({
+      status: 'success',
+      message: 'Data berhasil diedit!',
+      data: responseModelUpdate,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerCreateEpisode,
+  handlerEditEpisode,
 };
