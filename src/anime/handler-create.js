@@ -64,7 +64,7 @@ const handlerManualEditAnime = async (request, h) => {
       status: 'success',
       message: 'Data berhasil diedit!',
       data: responseUpdateManual,
-    });
+    }).code(200);
   } catch (err) {
     console.error(err);
     throw err;
