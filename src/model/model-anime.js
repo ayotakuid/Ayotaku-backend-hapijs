@@ -292,7 +292,7 @@ const handlerModelSyncAnime = async (animeUuid, dataUpdated) => {
       },
       {
         $sort: {
-          deleted_at: -1,
+          created_at: -1,
         },
       },
     ];
