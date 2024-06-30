@@ -344,7 +344,7 @@ const modelEditEpisode = async (episodeUuid, data, checking) => {
       dataUpdate = {
         $set: {
           episode: data.episode,
-          slug: createSlugEpisode(data.episode),
+          slug_eps: createSlugEpisode(data.episode),
           'link_stream.resol720': data.link_stream?.resol720,
           'link_stream.resol1080': data.link_stream?.resol1080,
           'link_download.resol720': data.link_download?.resol720,
