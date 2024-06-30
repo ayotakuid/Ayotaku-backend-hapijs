@@ -18,7 +18,7 @@ const handlerCallbackFromMal = async (request, h) => {
     const responseData = await handlerGetFullProfileMAL(tokenFromMAL.access_token);
 
     const response = h.response({
-      status: 'Success',
+      status: 'success',
       message: 'Berhasil didapatkan',
       responseData,
     });
