@@ -3,6 +3,8 @@ const {
   handlerGetAllUser,
   handlerGetOnlineUser,
 } = require("../model/model-users");
+const { handlerModelGetAllAnime } = require("../model/model-anime");
+const { modelGetAllEpisode } = require("../model/model-episode-anime");
 
 const handlerTotalUser = async (request, h) => {
   const credentialsUser = request.auth.credentials;
@@ -10,6 +12,8 @@ const handlerTotalUser = async (request, h) => {
 
   try {
     const allUser = await handlerGetAllUser();
+    const allAnime = await handlerModelGetAllAnime();
+    const allEpisode = await modelGetAllEpisode();
     const onlineUser = await handlerGetOnlineUser();
     const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
 
@@ -25,6 +29,8 @@ const handlerTotalUser = async (request, h) => {
       message: 'Total User',
       data: {
         totalUser: allUser.length,
+        totalAnime: allAnime.length,
+        totalEpisode: allEpisode.length,
         onlineUser: onlineUser.length,
       },
     }).code(200);

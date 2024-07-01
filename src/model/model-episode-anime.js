@@ -431,6 +431,16 @@ const modelEditEpisode = async (episodeUuid, data, checking) => {
   }
 };
 
+const modelGetAllEpisode = async () => {
+  try {
+    const getAllEpisode = await collection.find().toArray();
+    return getAllEpisode;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   modelSaveEpisode,
   modelShowEpisode,
@@ -438,4 +448,5 @@ module.exports = {
   modelShowEpisodeDelete,
   modelRecoveryEpisode,
   modelEditEpisode,
+  modelGetAllEpisode,
 };

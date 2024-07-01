@@ -363,6 +363,16 @@ const handlerModelManualEditAnime = async (animeUuid, dataUpdated) => {
   }
 };
 
+const handlerModelGetAllAnime = async () => {
+  try {
+    const getlAllAnime = await collection.find().toArray();
+    return getlAllAnime;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -372,4 +382,5 @@ module.exports = {
   handlerModelRecoveryAnime,
   handlerModelSyncAnime,
   handlerModelManualEditAnime,
+  handlerModelGetAllAnime,
 };
