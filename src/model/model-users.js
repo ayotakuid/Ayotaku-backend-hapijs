@@ -43,7 +43,8 @@ const handlerUpdateLoginUsers = async (dataUser, tokenAyotaku) => {
       },
     };
     const updateUsersLogin = collection.updateOne(query, dataUpdate);
-    return updateUsersLogin;
+    const resultFindLogin = await collection.findOne(query);
+    return resultFindLogin;
   } catch (err) {
     console.error(err);
   }

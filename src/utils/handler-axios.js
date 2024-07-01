@@ -56,6 +56,28 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
 
     const { data } = await axios.request(configAxios);
     const checkingUsers = await handlerUserByNameMAL(data.name);
+    const tokenAyotaku = createTokenAdmin({
+      id_mal: data.id,
+      name_mal: data.name,
+    });
+
+    if (checkingUsers !== null) {
+      const fields = {
+        id_mal: data.id,
+        name_mal: data.name,
+        img_profile: data.picture,
+        token_mal: tokenMAL,
+      };
+      const updatelogin = await handlerUpdateLoginUsers(fields, tokenAyotaku);
+      await handlerSaveLogsUser(checkingUsers, 'signin-admin');
+      fields.role = updatelogin.role;
+      const responseData = {
+        ...fields,
+        tokenAyotaku,
+      };
+      return responseData;
+    }
+
     const fields = {
       id_mal: data.id,
       name_mal: data.name,
@@ -63,19 +85,6 @@ const handlerGetFullProfileMAL = async (tokenMAL) => {
       token_mal: tokenMAL,
       role: 'user',
     };
-    const tokenAyotaku = createTokenAdmin(fields);
-
-    if (checkingUsers !== null) {
-      const updatelogin = await handlerUpdateLoginUsers(fields, tokenAyotaku);
-      await handlerSaveLogsUser(checkingUsers, 'signin-admin');
-      const responseData = {
-        ...fields,
-        tokenAyotaku,
-      };
-      console.log(updatelogin);
-      return responseData;
-    }
-
     await handlerSaveUsers(fields, tokenAyotaku);
     await handlerSaveLogsUser(fields, 'signup');
     const responseData = {

@@ -8,7 +8,6 @@ const createTokenAdmin = (dataToken) => {
   const data = {
     id_mal: dataToken?.id_mal,
     name_mal: dataToken?.name_mal,
-    role: dataToken?.role,
   };
 
   return JWT.sign(data, secretKey, {
@@ -20,7 +19,6 @@ const refreshTokenAdmin = (dataToken) => {
   const data = {
     id_mal: '',
     name_mal: '',
-    role: '',
   };
 
   return JWT.sign(data, secretKey, {
