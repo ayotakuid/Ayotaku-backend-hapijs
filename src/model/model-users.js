@@ -34,6 +34,22 @@ const handlerUpdateLoginUsers = async (dataUser, tokenAyotaku) => {
       name_mal: dataUser.name_mal,
     };
 
+    const checkingIsLogin = await collection.findOne(query);
+
+    if (checkingIsLogin.role === 'user') {
+      const dataUpdate = {
+        $set: {
+          timeLogin: new Date().toISOString(),
+          isLogin: false,
+          token: tokenAyotaku,
+          token_mal: dataUser.token_mal,
+        },
+      };
+      await collection.updateOne(query, dataUpdate);
+      const resultFindLogin = await collection.findOne(query);
+      return resultFindLogin;
+    }
+
     const dataUpdate = {
       $set: {
         timeLogin: new Date().toISOString(),
@@ -42,7 +58,7 @@ const handlerUpdateLoginUsers = async (dataUser, tokenAyotaku) => {
         token_mal: dataUser.token_mal,
       },
     };
-    const updateUsersLogin = collection.updateOne(query, dataUpdate);
+    await collection.updateOne(query, dataUpdate);
     const resultFindLogin = await collection.findOne(query);
     return resultFindLogin;
   } catch (err) {
