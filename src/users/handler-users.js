@@ -6,7 +6,7 @@ const {
   handlerGetToken,
   handlerGetFullProfileMAL,
 } = require('../utils/handler-axios');
-const { handlerUserByNameMAL, handlerUpdateSignOutUsers } = require('../model/model-users');
+const { handlerUserByNameMAL, handlerUpdateSignOutUsers, handlerShowUsers } = require('../model/model-users');
 const { refreshTokenAdmin, checkingTokenForAll } = require('../utils/handler-token');
 const { handlerSaveLogsUser } = require('../model/model-logs');
 
@@ -133,9 +133,45 @@ const handlerGetProfileUser = async (request, h) => {
   }
 };
 
+const handlerGetAllUser = async (request, h) => {
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUser.name_mal);
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (!isExpired) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    if (userFind.role !== 'admin') {
+      return h.response({
+        status: 'fail',
+        message: 'Kamu tidak berhak akses ini!',
+      }).code(401);
+    }
+
+    const responseModel = await handlerShowUsers();
+    return h.response({
+      status: 'success',
+      message: 'Berhasil mendapatkan data Users!',
+      data: responseModel,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerCallbackFromMal,
   checkingTokenExp,
   handlerSignOutAdmin,
   handlerGetProfileUser,
+  handlerGetAllUser,
 };

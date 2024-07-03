@@ -3,6 +3,7 @@ const {
   checkingTokenExp,
   handlerSignOutAdmin,
   handlerGetProfileUser,
+  handlerGetAllUser,
 } = require("./src/users/handler-users");
 const { handlerTotalUser } = require("./src/users/handler-total");
 const { handlerLogs } = require("./src/logs/handler-logs");
@@ -209,6 +210,15 @@ const routes = [
     method: 'PUT',
     path: '/api/anime/episode/edit',
     handler: handlerEditEpisode,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/users',
+    handler: handlerGetAllUser,
     options: {
       auth: 'jwt',
       cors: true,

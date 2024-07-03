@@ -119,6 +119,16 @@ const handlerGetOnlineUser = async () => {
   }
 };
 
+const handlerShowUsers = async () => {
+  try {
+    const getAllUsers = await collection.find().sort({ created_at: -1 }).toArray();
+    return getAllUsers;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveUsers,
   handlerUserByNameMAL,
@@ -126,4 +136,5 @@ module.exports = {
   handlerUpdateSignOutUsers,
   handlerGetAllUser,
   handlerGetOnlineUser,
+  handlerShowUsers,
 };
