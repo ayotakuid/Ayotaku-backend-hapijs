@@ -6,7 +6,12 @@ const {
   handlerGetToken,
   handlerGetFullProfileMAL,
 } = require('../utils/handler-axios');
-const { handlerUserByNameMAL, handlerUpdateSignOutUsers, handlerShowUsers } = require('../model/model-users');
+const {
+  handlerUserByNameMAL,
+  handlerUpdateSignOutUsers,
+  handlerShowUsers,
+  handlerEditRoleUsers,
+} = require('../model/model-users');
 const { refreshTokenAdmin, checkingTokenForAll } = require('../utils/handler-token');
 const { handlerSaveLogsUser } = require('../model/model-logs');
 
@@ -168,10 +173,47 @@ const handlerGetAllUser = async (request, h) => {
   }
 };
 
+const handlerUpdateRoleUser = async (request, h) => {
+  const { name_mal, role } = request.payload;
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split;
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUser?.name_mal);
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (!isExpired) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    if (userFind?.role !== 'admin') {
+      return h.response({
+        status: 'fail',
+        message: 'Kamu tidak berhasl disini!',
+      }).code(401);
+    }
+
+    const responseEditRole = await handlerEditRoleUsers(name_mal, role);
+    return h.response({
+      status: 'success',
+      message: 'Role User berhasil diubah!',
+      data: responseEditRole,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerCallbackFromMal,
   checkingTokenExp,
   handlerSignOutAdmin,
   handlerGetProfileUser,
   handlerGetAllUser,
+  handlerUpdateRoleUser,
 };

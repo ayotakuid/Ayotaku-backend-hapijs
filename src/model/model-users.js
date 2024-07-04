@@ -129,6 +129,26 @@ const handlerShowUsers = async () => {
   }
 };
 
+const handlerEditRoleUsers = async (nameMAL, dataRole) => {
+  try {
+    const query = {
+      name_mal: nameMAL,
+    };
+
+    const dataUpdate = {
+      $set: {
+        role: dataRole,
+      },
+    };
+
+    const updateRole = await collection.updateOne(query, dataUpdate);
+    const returnData = await collection.findOne(query);
+    return returnData;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 module.exports = {
   handlerSaveUsers,
   handlerUserByNameMAL,
@@ -137,4 +157,5 @@ module.exports = {
   handlerGetAllUser,
   handlerGetOnlineUser,
   handlerShowUsers,
+  handlerEditRoleUsers,
 };

@@ -4,6 +4,7 @@ const {
   handlerSignOutAdmin,
   handlerGetProfileUser,
   handlerGetAllUser,
+  handlerUpdateRoleUser,
 } = require("./src/users/handler-users");
 const { handlerTotalUser } = require("./src/users/handler-total");
 const { handlerLogs } = require("./src/logs/handler-logs");
@@ -219,6 +220,15 @@ const routes = [
     method: 'GET',
     path: '/api/users',
     handler: handlerGetAllUser,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/api/users/role/update',
+    handler: handlerUpdateRoleUser,
     options: {
       auth: 'jwt',
       cors: true,
