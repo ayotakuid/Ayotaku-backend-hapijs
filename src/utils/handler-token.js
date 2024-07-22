@@ -1,6 +1,7 @@
 const JWT = require('jsonwebtoken');
 const {
   secretKey,
+  secretKeyUser,
 } = require('./secret.json');
 const { handlerUserByNameMAL } = require('../model/model-users');
 
@@ -54,8 +55,21 @@ const checkingTokenForAll = async (credentials, token) => {
   }
 };
 
+const createTokenUsers = (dataToken) => {
+  const data = {
+    id_google: dataToken?.sub,
+    name_google: dataToken?.name,
+    email_google: dataToken?.email,
+  };
+
+  return JWT.sign(data, secretKeyUser, {
+    expiresIn: '30d',
+  });
+};
+
 module.exports = {
   createTokenAdmin,
   refreshTokenAdmin,
   checkingTokenForAll,
+  createTokenUsers,
 };
