@@ -1,7 +1,16 @@
 const Hapi = require('@hapi/hapi');
+const Bell = require('@hapi/bell');
 const HapiJWT2 = require('hapi-auth-jwt2');
+const HapiRateLimit = require('hapi-rate-limit');
 const routes = require('./routes');
-const { secretKey } = require('./src/utils/secret.json');
+const routesUser = require('./routesUser');
+const {
+  secretKey,
+  secretKeyUser,
+  PASSWORD_STRATEGY_GOOGLE,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+} = require('./src/utils/secret.json');
 const { connect } = require('./src/db/config');
 const { handlerUserByNameMAL } = require('./src/model/model-users');
 
@@ -11,6 +20,22 @@ const validateToken = async (decoded, request, h) => {
   const user = await handlerUserByNameMAL(name_mal);
 
   if (!user) {
+    return {
+      isValid: false,
+    };
+  }
+
+  return {
+    isValid: true,
+    credentials: decoded,
+  };
+};
+
+const validateTokenUsers = async (decoded, request, h) => {
+  const { name_google } = decoded;
+  console.log(name_google);
+
+  if (!name_google) {
     return {
       isValid: false,
     };
@@ -35,6 +60,34 @@ const init = async () => {
   });
 
   await server.register(HapiJWT2);
+  await server.register(Bell);
+  await server.register({
+    plugin: HapiRateLimit,
+    options: {
+      userLimit: 20,
+      pathLimit: false,
+      userCache: {
+        expiresIn: 5000,
+      },
+      pathCache: {
+        expiresIn: 5000,
+        getDecoratedValue: true,
+        segment: 'hapi-rate-limit-path',
+      },
+      authCache: {
+        expiresIn: 5000,
+        getDecoratedValue: true,
+        segment: 'hapi-rate-limit-auth',
+      },
+    },
+  });
+
+  server.events.on('response', (request) => {
+    const limit = request.plugins['hapi-rate-limit'];
+    if (limit) {
+      console.log(limit);
+    }
+  });
 
   server.auth.strategy('jwt', 'jwt', {
     key: secretKey,
@@ -42,14 +95,32 @@ const init = async () => {
     verifyOptions: { algorithms: ['HS256'] },
   });
 
+  server.auth.strategy('jwtUsers', 'jwt', {
+    key: secretKeyUser,
+    validate: validateTokenUsers,
+    verifyOptions: { algorithms: ['HS256'] },
+  });
+
+  server.auth.strategy('google', 'bell', {
+    provider: 'google',
+    password: PASSWORD_STRATEGY_GOOGLE,
+    clientId: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    isSecure: false,
+  });
+
   server.auth.default('jwt');
 
   await connect();
 
   server.route(routes);
+  server.route(routesUser);
 
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);
 };
 
-init();
+init().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
