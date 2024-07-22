@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@hapi/bell':
+    specifier: ^13.0.2
+    version: 13.0.2
   '@hapi/boom':
     specifier: ^10.0.1
     version: 10.0.1
@@ -20,6 +23,9 @@ dependencies:
   hapi-auth-jwt2:
     specifier: ^10.5.1
     version: 10.5.1
+  hapi-rate-limit:
+    specifier: ^7.1.0
+    version: 7.1.0(@hapi/hapi@21.3.6)
   jsonwebtoken:
     specifier: ^9.0.2
     version: 9.0.2
@@ -105,6 +111,18 @@ packages:
     resolution: {integrity: sha512-ZvjX4JQReUmBheeCq+S9YavcnMMHWqx3S0jHNXWIM1kQDxB9cyfSycpVvjfrKcIS8Mh5N3hmu/YKo4Iag9g2Kw==}
     dependencies:
       '@hapi/hoek': 11.0.4
+    dev: false
+
+  /@hapi/bell@13.0.2:
+    resolution: {integrity: sha512-C4Rn23URNinjVCeGkQxVXIs24RRVxkt6OhklIMa3P1TA7UCdq3yJKKDpjiYfWZ/clievNK4NdxCo+ffWJfTQ7w==}
+    engines: {node: '>=14.0.0'}
+    dependencies:
+      '@hapi/boom': 10.0.1
+      '@hapi/bounce': 3.0.1
+      '@hapi/cryptiles': 6.0.1
+      '@hapi/hoek': 11.0.4
+      '@hapi/wreck': 18.0.1
+      joi: 17.13.3
     dev: false
 
   /@hapi/boom@10.0.1:
@@ -196,8 +214,16 @@ packages:
       '@hapi/validate': 2.0.1
     dev: false
 
+  /@hapi/hoek@10.0.1:
+    resolution: {integrity: sha512-CvlW7jmOhWzuqOqiJQ3rQVLMcREh0eel4IBnxDx2FAcK8g7qoJRQK4L1CPBASoCY6y8e6zuCy3f2g+HWdkzcMw==}
+    dev: false
+
   /@hapi/hoek@11.0.4:
     resolution: {integrity: sha512-PnsP5d4q7289pS2T2EgGz147BFJ2Jpb4yrEdkpz2IhgEUzos1S7HTl7ezWh1yfYzYlj89KzLdCRkqsP6SIryeQ==}
+    dev: false
+
+  /@hapi/hoek@9.3.0:
+    resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}
     dev: false
 
   /@hapi/iron@7.0.1:
@@ -284,6 +310,12 @@ packages:
   /@hapi/teamwork@6.0.0:
     resolution: {integrity: sha512-05HumSy3LWfXpmJ9cr6HzwhAavrHkJ1ZRCmNE2qJMihdM5YcWreWPfyN0yKT2ZjCM92au3ZkuodjBxOibxM67A==}
     engines: {node: '>=14.0.0'}
+    dev: false
+
+  /@hapi/topo@5.1.0:
+    resolution: {integrity: sha512-foQZKJig7Ob0BMAYBfcJk8d77QtOe7Wo4ox7ff1lQYoNNAb6jwcY1ncdoy2e9wQZzvNy7ODZCYJkK8kzmcAnAg==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
     dev: false
 
   /@hapi/topo@6.0.2:
@@ -377,6 +409,20 @@ packages:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
     dev: true
+
+  /@sideway/address@4.1.5:
+    resolution: {integrity: sha512-IqO/DUQHUkPeixNQ8n0JA6102hT9CmaljNTPmQ1u8MEhBo/R4Q8eKLN/vGZxuebwOroDB4cbpjheD4+/sKFK4Q==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
+    dev: false
+
+  /@sideway/formula@3.0.1:
+    resolution: {integrity: sha512-/poHZJJVjx3L+zVD6g9KgHfYnb443oi7wLu/XKojDviHy6HOEOA6z1Trk5aR1dGcmPenJEgb2sK2I80LeS3MIg==}
+    dev: false
+
+  /@sideway/pinpoint@2.0.0:
+    resolution: {integrity: sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==}
+    dev: false
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
@@ -1257,6 +1303,19 @@ packages:
       jsonwebtoken: 9.0.2
     dev: false
 
+  /hapi-rate-limit@7.1.0(@hapi/hapi@21.3.6):
+    resolution: {integrity: sha512-Q/KORXpkANqMhVkzcdlcJu2NoaQNWkOlaxRKCfdmVEjtqZVR9p0NbJi7mB+3p137ogl9n9gTk4JhJNUUaQPcnQ==}
+    engines: {node: ^18.0.0 || ^20.0.0}
+    peerDependencies:
+      '@hapi/hapi': '>=18.0.0'
+    dependencies:
+      '@hapi/boom': 10.0.1
+      '@hapi/catbox-memory': 6.0.1
+      '@hapi/hapi': 21.3.6
+      '@hapi/hoek': 10.0.1
+      joi: 17.13.3
+    dev: false
+
   /has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
     dev: true
@@ -1489,6 +1548,16 @@ packages:
   /isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
     dev: true
+
+  /joi@17.13.3:
+    resolution: {integrity: sha512-otDA4ldcIx+ZXsKHWmp0YizCweVRZG96J10b0FevjfuncLO1oX59THoAmHkNubYJ+9gWsYsp5k8v4ib6oDv1fA==}
+    dependencies:
+      '@hapi/hoek': 9.3.0
+      '@hapi/topo': 5.1.0
+      '@sideway/address': 4.1.5
+      '@sideway/formula': 3.0.1
+      '@sideway/pinpoint': 2.0.0
+    dev: false
 
   /js-yaml@4.1.0:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
