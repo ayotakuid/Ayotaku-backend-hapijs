@@ -85,8 +85,21 @@ const init = async () => {
   server.events.on('response', (request) => {
     const limit = request.plugins['hapi-rate-limit'];
     if (limit) {
-      console.log(limit);
+      // console.log(limit);
     }
+  });
+
+  server.ext('onPreResponse', (request, h) => {
+    const { response } = request;
+    if (response.isBoom && response.output.statusCode === 429) {
+      return h.response({
+        status: 'error',
+        statusCode: 429,
+        message: 'Terlalu banyak request, coba lagi nanti!',
+      }).code(429);
+    }
+
+    return h.continue;
   });
 
   server.auth.strategy('jwt', 'jwt', {
