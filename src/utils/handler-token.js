@@ -60,6 +60,7 @@ const createTokenUsers = (dataToken) => {
     id_google: dataToken?.sub,
     name_google: dataToken?.name,
     email_google: dataToken?.email,
+    pic_google: dataToken?.picture,
   };
 
   return JWT.sign(data, secretKeyUser, {
