@@ -1,4 +1,4 @@
-const { handlerGoogleLoginUsers, handlerCallbackAfterLoginGoogle } = require("./src/ayotaku-users/handler-users/handler-users");
+const { handlerGoogleLoginUsers, handlerCallbackAfterLoginGoogle, sendCodeVerificationUser } = require("./src/ayotaku-users/handler-users/handler-users");
 const handlerErrorLimitRoutes = require("./src/error/handler-error-limit");
 const { createTokenUsers } = require("./src/utils/handler-token");
 
@@ -55,6 +55,26 @@ const routesUser = [
     },
     options: {
       auth: 'jwtUsers',
+      cors: true,
+      plugins: {
+        'hapi-rate-limit': {
+          pathLimit: 1,
+          pathCache: {
+            expiresIn: 5000,
+          },
+          authCache: {
+            expiresIn: 5000,
+          },
+        },
+      },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/user/email/send',
+    handler: sendCodeVerificationUser,
+    options: {
+      auth: false,
       cors: true,
       plugins: {
         'hapi-rate-limit': {
