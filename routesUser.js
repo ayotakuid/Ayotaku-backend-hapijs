@@ -68,26 +68,6 @@ const routesUser = [
       },
     },
   },
-  {
-    method: 'GET',
-    path: '/user/email/send',
-    handler: sendCodeVerificationUser,
-    options: {
-      auth: false,
-      cors: true,
-      plugins: {
-        'hapi-rate-limit': {
-          pathLimit: 1,
-          pathCache: {
-            expiresIn: 5000,
-          },
-          authCache: {
-            expiresIn: 5000,
-          },
-        },
-      },
-    },
-  },
 ];
 
 module.exports = routesUser;
