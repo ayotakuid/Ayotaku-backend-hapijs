@@ -2,8 +2,14 @@ const { nanoid } = require('nanoid');
 const nodeMailer = require('nodemailer');
 const { createTokenUsers } = require("../../utils/handler-token");
 const { HOST_TRANSPORT_EMAIL, USER_EMAIL_SUPPORT, PASSWORD_EMAIL_SUPPORT } = require('../../utils/secret.json');
-const { modelSaveUserInformation } = require('../../ayotaku-model-users/ayotaku-model-users');
+const {
+  modelSaveUserInformation,
+  modelUpdateUserInfoLogin,
+  modelActivatedAccount,
+  modelFindUserGlobal,
+} = require('../../ayotaku-model-users/ayotaku-model-users');
 const { sendCodeVerifyUser } = require('../../ayotaku-model-users/ayotaku-send-email');
+const { templateHtmlAfterLogin, templateHtmlAccountNotActive } = require('../../utils/template-html');
 
 const handlerGoogleLoginUsers = async (request, h) => {
   const { profile } = request.auth.credentials;
@@ -74,18 +80,17 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
 
     const saveUserInfomation = await modelSaveUserInformation(userInformation, userInformation.tokenWeb, userInformation.tokenMob);
     if (!saveUserInfomation.register) {
-      return h.response({
-        status: 'success',
-        message: 'Email sudah ada!',
-      }).code(200);
+      const updatingInfoUser = await modelUpdateUserInfoLogin(userInformation.parseDataRaw.email, createTokenAccess);
+
+      if (updatingInfoUser.account === false) {
+        return h.response(templateHtmlAccountNotActive('Berhasil Register, Silahkan cek Email untuk Aktifasi Account!')).type('text/html');
+      }
+
+      return h.response(templateHtmlAfterLogin(updatingInfoUser.tokenWeb)).type('text/html');
     }
 
-    // return h.redirect(`https://stagingadmin.my.id/?token=${createTokenAccess}`);
     await sendCodeVerifyUser(userInformation.parseDataRaw.email, codeActived);
-    return h.response({
-      status: 'success',
-      message: 'Register berhasil!',
-    }).code(200);
+    return h.redirect(`/user/api/google/callback?raw=${rawParam}&type=web`);
   } catch (err) {
     console.error('Ada error saat callback setelah google: ', err);
     return h.response({
@@ -95,7 +100,45 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
   }
 };
 
+const handlerActivatedAccount = async (request, h) => {
+  const emailParams = request.query.email;
+  const codeParams = request.query.code;
+
+  try {
+    const dataUser = {
+      email: emailParams,
+      code: codeParams,
+    };
+    const responseActivated = await modelActivatedAccount(dataUser);
+    if (responseActivated.status === 'fail') {
+      return h.response({
+        status: 'fail',
+        message: responseActivated.message,
+      }).code(404);
+    }
+
+    const responseUser = await modelFindUserGlobal(emailParams);
+    const dataRawParams = {
+      sub: responseUser.from_google.id_google,
+      name: responseUser.from_google.nama_google,
+      email: responseUser.from_google.email,
+      picture: responseUser.from_google.picture,
+      email_verified: responseUser.from_google.email_verified,
+    };
+    const parseObject = JSON.stringify(dataRawParams);
+
+    return h.redirect(`/user/api/google/callback?raw=${parseObject}&type=web`);
+  } catch (err) {
+    console.error(err);
+    return h.response({
+      status: 'fail',
+      message: 'Terjadi kesalahan saat Activated Account',
+    }).code(401);
+  }
+};
+
 module.exports = {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
+  handlerActivatedAccount,
 };
