@@ -9,12 +9,21 @@ const {
   modelFindUserGlobal,
 } = require('../../ayotaku-model-users/ayotaku-model-users');
 const { sendCodeVerifyUser } = require('../../ayotaku-model-users/ayotaku-send-email');
-const { templateHtmlAfterLogin, templateHtmlAccountNotActive } = require('../../utils/template-html');
+const { templateHtmlAfterLogin, templateHtmlAccountNotActive, templateHtmlCancelLoginGoogle } = require('../../utils/template-html');
 
 const handlerGoogleLoginUsers = async (request, h) => {
   const { profile } = request.auth.credentials;
+  const { error, state } = request.query;
 
   try {
+    if (error === "access_denied" && !state) {
+      console.log(error);
+      return h.response({
+        status: 'fail',
+        message: 'User cancel it!',
+      }).code(400);
+    }
+
     const dataToken = JSON.stringify(profile.raw);
     return h.redirect(`/user/api/google/callback?raw=${dataToken}&type=web`);
   } catch (err) {
@@ -86,7 +95,7 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
         return h.response(templateHtmlAccountNotActive('Berhasil Register, Silahkan cek Email untuk Aktifasi Account!')).type('text/html');
       }
 
-      return h.response(templateHtmlAfterLogin(updatingInfoUser.tokenWeb)).type('text/html');
+      return h.response(templateHtmlAfterLogin(updatingInfoUser.tokenWeb, true)).type('text/html');
     }
 
     await sendCodeVerifyUser(userInformation.parseDataRaw.email, codeActived);
