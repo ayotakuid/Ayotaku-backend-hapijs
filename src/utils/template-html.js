@@ -1,5 +1,5 @@
-const templateHtmlAfterLogin = (data) => {
-  const redirectUrl = `http://127.0.0.1:5500/index.html?token=${data}`;
+const templateHtmlAfterLogin = (data, isLogin) => {
+  const redirectUrl = `http://localhost:5173/?token=${data}&isLogin=${isLogin}`;
   const htmlContent = `
       <!DOCTYPE html>
         <html>
@@ -7,27 +7,19 @@ const templateHtmlAfterLogin = (data) => {
           <title>Redirect and Close</title>
           <script type="text/javascript">
             // Buka tab baru dengan URL tertentu
-            const newTab = window.open('${redirectUrl}', '_blank');
-
+            
             // Tunggu beberapa detik untuk memastikan tab baru terbuka
             setTimeout(() => {
               
               // Tutup tab saat ini setelah membuka tab baru
+              const newTab = window.open('${redirectUrl}', '_blank');
               window.close();
 
-              // Jika tab tidak menutup otomatis, beri instruksi kepada pengguna
-              setTimeout(() => {
-                document.getElementById('fallback').style.display = 'block';
-              }, 1000);
-
-            }, 3000); // Sesuaikan dengan waktu yang diinginkan
+            }, 500); // Sesuaikan dengan waktu yang diinginkan
           </script>
         </head>
         <body>
-          <p>Menutup tab...</p>
-          <div id="fallback" style="display:none;">
-            <p>Jika tab tidak tertutup, <a href="javascript:window.close();">klik di sini</a>.</p>
-          </div>
+        loading redirect...
         </body>
       </html>
       `;
@@ -36,14 +28,27 @@ const templateHtmlAfterLogin = (data) => {
 };
 
 const templateHtmlAccountNotActive = (data) => {
+  const redirect = "http://localhost:5173/register/success";
   const htmlContent = `
     <!DOCTYPE html>
         <html>
         <head>
           <title>Silahkan cek Email anda!</title>
+          <script type="text/javascript">
+            // Buka tab baru dengan URL tertentu
+            
+            // Tunggu beberapa detik untuk memastikan tab baru terbuka
+            setTimeout(() => {
+              
+              // Tutup tab saat ini setelah membuka tab baru
+              const newTab = window.open('${redirect}', '_blank');
+              window.close();
+
+            }, 2000); // Sesuaikan dengan waktu yang diinginkan
+          </script>
         </head>
         <body>
-          <p>${data}</p>
+          <p>loading redirect...</p>
         </body>
       </html>
   `;
