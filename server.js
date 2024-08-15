@@ -99,6 +99,14 @@ const init = async () => {
       }).code(429);
     }
 
+    if (response.isBoom) {
+      const { output } = response;
+
+      if (output.statusCode === 500) {
+        return h.redirect('/user/auth/google');
+      }
+    }
+
     return h.continue;
   });
 
@@ -120,6 +128,7 @@ const init = async () => {
     clientId: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
     isSecure: false,
+    location: server.info.uri,
   });
 
   server.auth.default('jwt');
@@ -137,3 +146,17 @@ init().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+
+// server.auth.strategy('google', 'bell', {
+//   provider: 'google',
+//   password: 'your-secret-bell-password-that-is-at-least-32-characters-long',
+//   isSecure: false, // False untuk pengembangan, pastikan menjadi true di production
+//   clientId: 'YOUR_GOOGLE_CLIENT_ID',
+//   clientSecret: 'YOUR_GOOGLE_CLIENT_SECRET',
+//   location: server.info.uri,
+//   providerParams: {
+//     access_type: 'offline', // Ini memungkinkan untuk mendapatkan refresh token
+//   },
+//   scope: ['profile', 'email'],
+//   forceHttps: true // Pakai true untuk produksi
+// });
