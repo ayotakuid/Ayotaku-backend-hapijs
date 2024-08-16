@@ -75,7 +75,7 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
     }
 
     const codeActived = nanoid(32);
-    const createTokenAccess = createTokenUsers(parseDataRaw);
+    const createTokenAccess = createTokenUsers(parseDataRaw, paramType);
     const userInformation = {
       parseDataRaw,
       via_register: 'google',
@@ -111,13 +111,12 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
 };
 
 const handlerActivatedAccount = async (request, h) => {
-  const emailParams = request.query.email;
-  const codeParams = request.query.code;
+  const { _email, _code } = request.payload;
 
   try {
     const dataUser = {
-      email: emailParams,
-      code: codeParams,
+      email: _email,
+      code: _code,
     };
     const responseActivated = await modelActivatedAccount(dataUser);
     if (responseActivated.status === 'fail') {
@@ -127,7 +126,7 @@ const handlerActivatedAccount = async (request, h) => {
       }).code(404);
     }
 
-    const responseUser = await modelFindUserGlobal(emailParams);
+    const responseUser = await modelFindUserGlobal(_email);
     const dataRawParams = {
       sub: responseUser.from_google.id_google,
       name: responseUser.from_google.nama_google,
@@ -137,7 +136,15 @@ const handlerActivatedAccount = async (request, h) => {
     };
     const parseObject = JSON.stringify(dataRawParams);
 
-    return h.redirect(`/user/api/google/callback?raw=${parseObject}&type=web`);
+    // return h.redirect(`/user/api/google/callback?raw=${parseObject}&type=web`);
+    return h.response({
+      status: 'success',
+      message: 'Berhasil diaktifkan',
+      data: {
+        _isLogin: true,
+        tokenWeb: responseUser.tokenWeb,
+      },
+    }).code(200);
   } catch (err) {
     console.error(err);
     return h.response({
@@ -147,8 +154,27 @@ const handlerActivatedAccount = async (request, h) => {
   }
 };
 
+const handlerProfileUser = async (request, h) => {
+  const credentialsuser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+
+  try {
+    return h.response({
+      status: 'success',
+      data: credentialsuser,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    return h.response({
+      status: 'error',
+      message: 'Terjadi kesalahan saat ambil Profile',
+    }).code(400);
+  }
+};
+
 module.exports = {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
   handlerActivatedAccount,
+  handlerProfileUser,
 };
