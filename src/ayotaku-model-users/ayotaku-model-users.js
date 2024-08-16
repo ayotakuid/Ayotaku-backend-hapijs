@@ -126,9 +126,66 @@ const modelActivatedAccount = async (userInformation) => {
   }
 };
 
+const findUserForValidateToken = async (userInformation) => {
+  try {
+    const querUser = {
+      "from_google.email": userInformation.email_google,
+    };
+    const findUser = await collection.findOne(querUser);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const expiredTokenWeb = userInformation.exp < currentTime;
+
+    if (findUser.from_google.email !== userInformation.email_google) {
+      return {
+        status: 'fail',
+        message: 'Tidak ada Email seperti ini',
+        data: false,
+      };
+    }
+
+    if (!findUser.account_active) {
+      return {
+        status: 'fail',
+        message: 'Account belom aktif!',
+        data: false,
+      };
+    }
+
+    if (userInformation.type === 'mobile') {
+      const expiredToken = userInformation.exp < currentTime;
+
+      if (expiredToken) {
+        return {
+          status: 'fail',
+          message: 'Token Expired',
+          data: false,
+        };
+      }
+    }
+
+    if (expiredTokenWeb) {
+      return {
+        status: 'fail',
+        message: 'Token Expired',
+        data: false,
+      };
+    }
+
+    return {
+      status: 'success',
+      message: 'Oke boleh lanjut',
+      data: true,
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   modelFindUserGlobal,
   modelSaveUserInformation,
   modelUpdateUserInfoLogin,
   modelActivatedAccount,
+  findUserForValidateToken,
 };
