@@ -13,6 +13,7 @@ const {
 } = require('./src/utils/secret.json');
 const { connect } = require('./src/db/config');
 const { handlerUserByNameMAL } = require('./src/model/model-users');
+const { findUserForValidateToken } = require('./src/ayotaku-model-users/ayotaku-model-users');
 
 const validateToken = async (decoded, request, h) => {
   const { name_mal } = decoded;
@@ -32,10 +33,9 @@ const validateToken = async (decoded, request, h) => {
 };
 
 const validateTokenUsers = async (decoded, request, h) => {
-  const { name_google } = decoded;
-  console.log(name_google);
+  const responseValidate = await findUserForValidateToken(decoded);
 
-  if (!name_google) {
+  if (!responseValidate.data) {
     return {
       isValid: false,
     };
@@ -53,7 +53,7 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['http://127.0.0.1:8000'],
+        origin: ['http://127.0.0.1:8000', 'http://localhost:5173'],
         credentials: true,
       },
     },
