@@ -28,7 +28,7 @@ const templateHtmlAfterLogin = (data, isLogin) => {
 };
 
 const templateHtmlAccountNotActive = (data) => {
-  const redirect = "http://localhost:5173/register/success";
+  const redirect = `http://localhost:5173/register?account=${data}`;
   const htmlContent = `
     <!DOCTYPE html>
         <html>

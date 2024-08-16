@@ -92,7 +92,8 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
       const updatingInfoUser = await modelUpdateUserInfoLogin(userInformation.parseDataRaw.email, createTokenAccess);
 
       if (updatingInfoUser.account === false) {
-        return h.response(templateHtmlAccountNotActive('Berhasil Register, Silahkan cek Email untuk Aktifasi Account!')).type('text/html');
+        const dataChecking = (!updatingInfoUser.account) ? 'not_active' : '';
+        return h.response(templateHtmlAccountNotActive(dataChecking)).type('text/html');
       }
 
       return h.response(templateHtmlAfterLogin(updatingInfoUser.tokenWeb, true)).type('text/html');
