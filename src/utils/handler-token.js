@@ -55,12 +55,13 @@ const checkingTokenForAll = async (credentials, token) => {
   }
 };
 
-const createTokenUsers = (dataToken) => {
+const createTokenUsers = (dataToken, typeLogin) => {
   const data = {
     id_google: dataToken?.sub,
     name_google: dataToken?.name,
     email_google: dataToken?.email,
     pic_google: dataToken?.picture,
+    type: typeLogin,
   };
 
   return JWT.sign(data, secretKeyUser, {
