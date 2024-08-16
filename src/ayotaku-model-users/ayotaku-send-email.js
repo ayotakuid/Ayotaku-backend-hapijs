@@ -58,7 +58,7 @@ const sendCodeVerifyUser = async (emailUser, code) => {
                 <p>Ini adalah Email Otomatis yang dikirim kan kepada User untuk memberikan Link Activation Email. Klik lik dibawah ini untuk Activation Email anda!</p>
                 <p>Click Button dibawah ini ya...😊</p>
                 
-                <a href="http://localhost:9001/user/api/active-email?email=${emailUser}&code=${code}" class="btn-primary">Activation Email</a>
+                <a href="http://localhost:5173/activate?email=${emailUser}&code=${code}" class="btn-primary">Activation Email</a>
                 <break>
                 <p>Best regards,<br>Ayotaku.id Team</p>
               </div>
