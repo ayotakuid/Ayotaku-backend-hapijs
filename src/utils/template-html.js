@@ -12,7 +12,7 @@ const templateHtmlAfterLogin = (data, isLogin) => {
             setTimeout(() => {
               
               // Tutup tab saat ini setelah membuka tab baru
-              const newTab = window.open('${redirectUrl}', '_blank');
+              window.opener.postMessage({ status: 'done', url: '${redirectUrl}' }, '*');
               window.close();
 
             }, 500); // Sesuaikan dengan waktu yang diinginkan
@@ -41,7 +41,7 @@ const templateHtmlAccountNotActive = (data) => {
             setTimeout(() => {
               
               // Tutup tab saat ini setelah membuka tab baru
-              const newTab = window.open('${redirect}', '_blank');
+              window.opener.postMessage({ status: 'done', url: '${redirect}' }, '*');
               window.close();
 
             }, 2000); // Sesuaikan dengan waktu yang diinginkan
