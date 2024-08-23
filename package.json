@@ -17,6 +17,8 @@
     "nodemon": "^3.1.0"
   },
   "dependencies": {
+    "@dicebear/collection": "^9.2.1",
+    "@dicebear/core": "^9.2.1",
     "@hapi/bell": "^13.0.2",
     "@hapi/boom": "^10.0.1",
     "@hapi/hapi": "^21.3.6",
