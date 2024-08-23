@@ -3,6 +3,7 @@ const {
   handlerCallbackAfterLoginGoogle,
   handlerActivatedAccount,
   handlerProfileUser,
+  handlerSignupUser,
 } = require("./src/ayotaku-users/handler-users/handler-users");
 const { createTokenUsers } = require("./src/utils/handler-token");
 
@@ -48,6 +49,26 @@ const routesUser = [
     },
   },
   {
+    method: 'POST',
+    path: '/user/api/signup',
+    handler: handlerSignupUser,
+    options: {
+      auth: false,
+      cors: true,
+      plugins: {
+        'hapi-rate-limit': {
+          pathLimit: 5,
+          pathCache: {
+            expiresIn: 10000,
+          },
+          authCache: {
+            expiresIn: 5000,
+          },
+        },
+      },
+    },
+  },
+  {
     method: 'GET',
     path: '/user/api/profile',
     handler: handlerProfileUser,
@@ -58,7 +79,7 @@ const routesUser = [
         'hapi-rate-limit': {
           pathLimit: 5,
           pathCache: {
-            expiresIn: 5000,
+            expiresIn: 10000,
           },
           authCache: {
             expiresIn: 5000,

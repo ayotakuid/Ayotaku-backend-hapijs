@@ -1,7 +1,11 @@
 const { nanoid } = require('nanoid');
 const nodeMailer = require('nodemailer');
 const { createTokenUsers } = require("../../utils/handler-token");
-const { HOST_TRANSPORT_EMAIL, USER_EMAIL_SUPPORT, PASSWORD_EMAIL_SUPPORT } = require('../../utils/secret.json');
+const {
+  HOST_TRANSPORT_EMAIL,
+  USER_EMAIL_SUPPORT,
+  PASSWORD_EMAIL_SUPPORT,
+} = require('../../utils/secret.json');
 const {
   modelSaveUserInformation,
   modelUpdateUserInfoLogin,
@@ -10,6 +14,7 @@ const {
 } = require('../../ayotaku-model-users/ayotaku-model-users');
 const { sendCodeVerifyUser } = require('../../ayotaku-model-users/ayotaku-send-email');
 const { templateHtmlAfterLogin, templateHtmlAccountNotActive, templateHtmlCancelLoginGoogle } = require('../../utils/template-html');
+const { createAvatarDefault } = require('../../utils/handler-avatar');
 
 const handlerGoogleLoginUsers = async (request, h) => {
   const { profile } = request.auth.credentials;
@@ -172,9 +177,40 @@ const handlerProfileUser = async (request, h) => {
   }
 };
 
+const handlerSignupUser = async (request, h) => {
+  const {
+    _email,
+    _username,
+    _password,
+    _type,
+  } = request.payload;
+
+  try {
+    const dataSignUpUser = {
+      email: _email,
+      username: _username,
+      password: _password,
+      via: 'form',
+      picture: await createAvatarDefault(_username),
+    };
+
+    return h.response({
+      status: 'success',
+      message: 'Register Success, Check your email.',
+      data: dataSignUpUser,
+    }).code(200);
+  } catch (err) {
+    return h.response({
+      status: 'fail',
+      message: 'Kesalahan saat Sign Up!',
+    }).code(400);
+  }
+};
+
 module.exports = {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
   handlerActivatedAccount,
   handlerProfileUser,
+  handlerSignupUser,
 };
