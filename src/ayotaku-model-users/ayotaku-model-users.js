@@ -42,14 +42,23 @@ const modelSaveUserInformation = async (newUser, tokenCreatedWeb, tokenCreatedMo
   };
 
   try {
-    const findUser = await collection.findOne({ "from_google.email": newUser.parseDataRaw.email });
+    const findUserViaEmail = await collection.findOne({ "from_google.email": newUser.parseDataRaw.email });
+    const findUserViaUsername = await collection.findOne({ username: newUser.username });
 
-    if (findUser) {
+    if (findUserViaEmail) {
       return {
         status: 'success',
-        message: 'data sudah ada',
+        message: 'Email already exist!',
         register: false,
-        user: findUser,
+        user: findUserViaEmail,
+      };
+    }
+
+    if (findUserViaUsername?.username === newUser.username && findUserViaUsername) {
+      return {
+        status: 'success',
+        message: 'Username already exist!',
+        register: false,
       };
     }
 
