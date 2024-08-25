@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid');
 const nodeMailer = require('nodemailer');
-const { createTokenUsers } = require("../../utils/handler-token");
+const { createTokenUsers, createTokenUserForm } = require("../../utils/handler-token");
 const {
   HOST_TRANSPORT_EMAIL,
   USER_EMAIL_SUPPORT,
@@ -186,18 +186,45 @@ const handlerSignupUser = async (request, h) => {
   } = request.payload;
 
   try {
-    const dataSignUpUser = {
-      email: _email,
+    const codeActived = nanoid(32);
+    const createAvatar = await createAvatarDefault(_username);
+    const dataToken = {
       username: _username,
+      email: _email,
+      picture: createAvatar,
+      type: _type,
+    };
+    const createTokenAccess = createTokenUserForm(dataToken, dataToken.type);
+    const dataSignUpUser = {
+      parseDataRaw: {
+        sub: null,
+        name: null,
+        email: _email,
+        picture: createAvatar,
+        email_verified: null,
+      },
+      via_register: 'form',
+      code_actived: codeActived,
+      username: _username,
+      displayUsername: null,
       password: _password,
-      via: 'form',
-      picture: await createAvatarDefault(_username),
+      tokenWeb: (_type === 'web') ? createTokenAccess : null,
+      tokenMob: (_type === 'mobile') ? createTokenAccess : null,
     };
 
+    const responseModelSaveUser = await modelSaveUserInformation(dataSignUpUser, dataSignUpUser.tokenWeb, dataSignUpUser.tokenMob);
+
+    if (!responseModelSaveUser.register) {
+      return h.response({
+        status: 'fail',
+        message: 'Email already exist!',
+      }).code(401);
+    }
+
+    await sendCodeVerifyUser(dataSignUpUser.parseDataRaw.email, codeActived);
     return h.response({
       status: 'success',
       message: 'Register Success, Check your email.',
-      data: dataSignUpUser,
     }).code(200);
   } catch (err) {
     return h.response({
