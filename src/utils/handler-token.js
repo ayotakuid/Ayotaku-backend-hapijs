@@ -69,9 +69,22 @@ const createTokenUsers = (dataToken, typeLogin) => {
   });
 };
 
+const createTokenUserForm = (dataToken, typeLogin) => {
+  const data = {
+    username: dataToken?.username,
+    email_google: dataToken?.email,
+    type: typeLogin,
+  };
+
+  return JWT.sign(data, secretKeyUser, {
+    expiresIn: '30d',
+  });
+};
+
 module.exports = {
   createTokenAdmin,
   refreshTokenAdmin,
   checkingTokenForAll,
   createTokenUsers,
+  createTokenUserForm,
 };
