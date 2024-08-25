@@ -217,7 +217,7 @@ const handlerSignupUser = async (request, h) => {
     if (!responseModelSaveUser.register) {
       return h.response({
         status: 'fail',
-        message: 'Email already exist!',
+        message: responseModelSaveUser.message,
       }).code(401);
     }
 
