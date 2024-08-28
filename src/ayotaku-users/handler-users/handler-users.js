@@ -1,6 +1,7 @@
 const { nanoid } = require('nanoid');
 const nodeMailer = require('nodemailer');
-const { createTokenUsers, createTokenUserForm } = require("../../utils/handler-token");
+const Bcrypt = require('bcrypt');
+const { createTokenUsers, createTokenUserForm, generateHashPassword } = require("../../utils/handler-token");
 const {
   HOST_TRANSPORT_EMAIL,
   USER_EMAIL_SUPPORT,
@@ -11,6 +12,7 @@ const {
   modelUpdateUserInfoLogin,
   modelActivatedAccount,
   modelFindUserGlobal,
+  modelFindUserByUsername,
 } = require('../../ayotaku-model-users/ayotaku-model-users');
 const { sendCodeVerifyUser } = require('../../ayotaku-model-users/ayotaku-send-email');
 const { templateHtmlAfterLogin, templateHtmlAccountNotActive, templateHtmlCancelLoginGoogle } = require('../../utils/template-html');
@@ -94,7 +96,7 @@ const handlerCallbackAfterLoginGoogle = async (request, h) => {
 
     const saveUserInfomation = await modelSaveUserInformation(userInformation, userInformation.tokenWeb, userInformation.tokenMob);
     if (!saveUserInfomation.register) {
-      const updatingInfoUser = await modelUpdateUserInfoLogin(userInformation.parseDataRaw.email, createTokenAccess);
+      const updatingInfoUser = await modelUpdateUserInfoLogin(userInformation.parseDataRaw.email, createTokenAccess, paramType);
 
       if (updatingInfoUser.account === false) {
         const dataChecking = (!updatingInfoUser.account) ? 'not_active' : '';
@@ -159,6 +161,7 @@ const handlerActivatedAccount = async (request, h) => {
   }
 };
 
+// PROFILE BELOM DI CONFIG UNTUK TOKEN YANG TIDAK SAMA MASIH BISA MASUK, SEHARUSNYA TIDAK BISA!
 const handlerProfileUser = async (request, h) => {
   const credentialsuser = request.auth.credentials;
   const tokenUser = request.headers.authorization;
@@ -188,10 +191,10 @@ const handlerSignupUser = async (request, h) => {
   try {
     const codeActived = nanoid(32);
     const createAvatar = await createAvatarDefault(_username);
+    const hashPassword = await generateHashPassword(_password);
     const dataToken = {
       username: _username,
       email: _email,
-      picture: createAvatar,
       type: _type,
     };
     const createTokenAccess = createTokenUserForm(dataToken, dataToken.type);
@@ -207,7 +210,7 @@ const handlerSignupUser = async (request, h) => {
       code_actived: codeActived,
       username: _username,
       displayUsername: null,
-      password: _password,
+      password: hashPassword,
       tokenWeb: (_type === 'web') ? createTokenAccess : null,
       tokenMob: (_type === 'mobile') ? createTokenAccess : null,
     };
@@ -234,10 +237,72 @@ const handlerSignupUser = async (request, h) => {
   }
 };
 
+const handlerSignInUser = async (request, h) => {
+  const { _username, _password, _type } = request.payload;
+
+  try {
+    const findUser = await modelFindUserByUsername(_username);
+
+    if (!findUser.account) {
+      return h.response({
+        status: 'fail',
+        message: findUser.message,
+      }).code(404);
+    }
+
+    const comparePassword = await Bcrypt.compare(_password, findUser.data?.password);
+    if (!comparePassword) {
+      return h.response({
+        status: 'fail',
+        message: 'Password salah, coba lagi!',
+      }).code(401);
+    }
+
+    const dataToken = {
+      username: _username,
+      email: findUser.data?.from_google.email,
+      type: _type,
+    };
+    const createTokenAccess = createTokenUserForm(dataToken, _type);
+    const updateUserLogin = await modelUpdateUserInfoLogin(findUser.data?.from_google.email, createTokenAccess, _type);
+
+    if (!updateUserLogin.status === 'fail') {
+      return h.response({
+        status: 'fail',
+        message: updateUserLogin.message,
+      }).code(401);
+    }
+
+    return h.response({
+      status: 'success',
+      message: 'Sign in successfully!',
+      user: {
+        uuid: updateUserLogin.uuid,
+        from_google: updateUserLogin.from_google,
+        via_register: updateUserLogin.via_register,
+        account_active: updateUserLogin.account_active,
+        username: updateUserLogin.username,
+        displayUsername: updateUserLogin.displayUsername,
+        isLogin: updateUserLogin.isLogin,
+        timeLogin: updateUserLogin.timeLogin,
+        tokenWeb: updateUserLogin.tokenWeb,
+        tokenMob: updateUserLogin.tokenMob,
+        created_at: updateUserLogin.created_at,
+      },
+    }).code(200);
+  } catch (err) {
+    return h.response({
+      status: 'fail',
+      message: 'Ada kesalahan saat Sign in!',
+    }).code(401);
+  }
+};
+
 module.exports = {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
   handlerActivatedAccount,
   handlerProfileUser,
   handlerSignupUser,
+  handlerSignInUser,
 };
