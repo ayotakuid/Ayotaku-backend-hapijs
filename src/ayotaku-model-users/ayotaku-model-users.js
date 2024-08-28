@@ -54,7 +54,8 @@ const modelSaveUserInformation = async (newUser, tokenCreatedWeb, tokenCreatedMo
       };
     }
 
-    if (findUserViaUsername?.username === newUser.username && findUserViaUsername) {
+    if (findUserViaUsername?.username === newUser.username
+        && findUserViaUsername && findUserViaUsername?.username !== null) {
       return {
         status: 'success',
         message: 'Username already exist!',
@@ -76,7 +77,7 @@ const modelSaveUserInformation = async (newUser, tokenCreatedWeb, tokenCreatedMo
   }
 };
 
-const modelUpdateUserInfoLogin = async (email, createTokenAccess) => {
+const modelUpdateUserInfoLogin = async (email, createTokenAccess, type) => {
   const query = {
     "from_google.email": email,
   };
@@ -90,13 +91,26 @@ const modelUpdateUserInfoLogin = async (email, createTokenAccess) => {
         account: false,
       };
     }
-    const dataUpdate = {
-      $set: {
-        isLogin: true,
-        timeLogin: new Date().toISOString(),
-        tokenWeb: createTokenAccess,
-      },
-    };
+
+    let dataUpdate;
+    if (type === 'mobile') {
+      dataUpdate = {
+        $set: {
+          isLogin: true,
+          timeLogin: new Date().toISOString(),
+          tokenMob: createTokenAccess,
+        },
+      };
+    } else {
+      dataUpdate = {
+        $set: {
+          isLogin: true,
+          timeLogin: new Date().toISOString(),
+          tokenWeb: createTokenAccess,
+        },
+      };
+    }
+
     const updateUserLogin = await collection.updateOne(query, dataUpdate);
     const findUser = await collection.findOne(query);
     return findUser;
@@ -128,6 +142,42 @@ const modelActivatedAccount = async (userInformation) => {
     return {
       status: 'success',
       message: 'Account berhasil di aktifkan!',
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const modelFindUserByUsername = async (_username) => {
+  const query = {
+    username: _username,
+  };
+
+  try {
+    const checkingEmailStatus = await collection.findOne(query);
+
+    if (!checkingEmailStatus) {
+      return {
+        status: 'fail',
+        message: 'Username tidak ada!',
+        account: false,
+      };
+    }
+
+    if (!checkingEmailStatus.account_active) {
+      return {
+        status: 'fail',
+        message: 'Account belom aktif!',
+        account: false,
+      };
+    }
+
+    return {
+      status: 'success',
+      message: 'here the account',
+      account: true,
+      data: checkingEmailStatus,
     };
   } catch (err) {
     console.error(err);
@@ -196,5 +246,6 @@ module.exports = {
   modelSaveUserInformation,
   modelUpdateUserInfoLogin,
   modelActivatedAccount,
+  modelFindUserByUsername,
   findUserForValidateToken,
 };
