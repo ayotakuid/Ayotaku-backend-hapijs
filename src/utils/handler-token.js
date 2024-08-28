@@ -1,3 +1,4 @@
+const Bcrypt = require('bcrypt');
 const JWT = require('jsonwebtoken');
 const {
   secretKey,
@@ -81,10 +82,27 @@ const createTokenUserForm = (dataToken, typeLogin) => {
   });
 };
 
+const generateHashPassword = async (password) => {
+  try {
+    if (!password) {
+      return null;
+    }
+
+    const saltRounds = 10;
+    const hash = await Bcrypt.hash(password, saltRounds);
+
+    return hash;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   createTokenAdmin,
   refreshTokenAdmin,
   checkingTokenForAll,
   createTokenUsers,
   createTokenUserForm,
+  generateHashPassword,
 };
