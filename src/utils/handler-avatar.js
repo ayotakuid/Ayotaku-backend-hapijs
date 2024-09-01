@@ -5,7 +5,7 @@ const createAvatarDefault = async (username) => {
   const responseCreate = createAvatar(adventurer, {
     seed: username,
     radius: 50,
-    size: 80,
+    size: 32,
     backgroundColor: ['ffdfbf', 'c0aede'],
     earringsProbability: 50,
     eyebrows: ['variant02', 'variant03', 'variant06', 'variant10', 'variant11', 'variant15'],
