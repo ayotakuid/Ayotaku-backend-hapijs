@@ -165,11 +165,34 @@ const handlerActivatedAccount = async (request, h) => {
 const handlerProfileUser = async (request, h) => {
   const credentialsuser = request.auth.credentials;
   const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
 
   try {
+    const findUser = await modelFindUserGlobal(credentialsuser.email_google);
+
+    if (findUser.tokenWeb !== tokenSplit[1]) {
+      return h.response({
+        status: 'fail',
+        message: 'Token tidak sesuai!',
+      }).code(401);
+    }
+
     return h.response({
       status: 'success',
-      data: credentialsuser,
+      message: 'User profile',
+      data: {
+        uuid: findUser.uuid,
+        from_google: findUser.from_google,
+        via_register: findUser.via_register,
+        account_active: findUser.account_active,
+        username: findUser.username,
+        displayUsername: findUser.displayUsername,
+        isLogin: findUser.isLogin,
+        timeLogin: findUser.timeLogin,
+        tokenWeb: findUser.tokenWeb,
+        tokenMob: findUser.tokenMob,
+        created_at: findUser.created_at,
+      },
     }).code(200);
   } catch (err) {
     console.error(err);
@@ -279,12 +302,7 @@ const handlerSignInUser = async (request, h) => {
       user: {
         uuid: updateUserLogin.uuid,
         from_google: updateUserLogin.from_google,
-        via_register: updateUserLogin.via_register,
-        account_active: updateUserLogin.account_active,
         username: updateUserLogin.username,
-        displayUsername: updateUserLogin.displayUsername,
-        isLogin: updateUserLogin.isLogin,
-        timeLogin: updateUserLogin.timeLogin,
         tokenWeb: updateUserLogin.tokenWeb,
         tokenMob: updateUserLogin.tokenMob,
         created_at: updateUserLogin.created_at,
