@@ -98,7 +98,7 @@ const routesUser = [
       cors: true,
       plugins: {
         'hapi-rate-limit': {
-          pathLimit: 5,
+          pathLimit: 20,
           pathCache: {
             expiresIn: 10000,
           },
