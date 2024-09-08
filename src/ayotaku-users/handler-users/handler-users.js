@@ -13,6 +13,7 @@ const {
   modelActivatedAccount,
   modelFindUserGlobal,
   modelFindUserByUsername,
+  modelUpdateDisplayUsername,
 } = require('../../ayotaku-model-users/ayotaku-model-users');
 const { sendCodeVerifyUser } = require('../../ayotaku-model-users/ayotaku-send-email');
 const { templateHtmlAfterLogin, templateHtmlAccountNotActive, templateHtmlCancelLoginGoogle } = require('../../utils/template-html');
@@ -161,7 +162,7 @@ const handlerActivatedAccount = async (request, h) => {
   }
 };
 
-// PROFILE BELOM DI CONFIG UNTUK TOKEN YANG TIDAK SAMA MASIH BISA MASUK, SEHARUSNYA TIDAK BISA!
+// HANDLER UNTUK PROFILE USER
 const handlerProfileUser = async (request, h) => {
   const credentialsuser = request.auth.credentials;
   const tokenUser = request.headers.authorization;
@@ -203,6 +204,7 @@ const handlerProfileUser = async (request, h) => {
   }
 };
 
+// HANDLER UNTUK SIGN UP LEWAT FORM
 const handlerSignupUser = async (request, h) => {
   const {
     _email,
@@ -260,6 +262,7 @@ const handlerSignupUser = async (request, h) => {
   }
 };
 
+// HANDLER UNTUK SIGN IN LEWAT FORM
 const handlerSignInUser = async (request, h) => {
   const { _username, _password, _type } = request.payload;
 
@@ -316,6 +319,44 @@ const handlerSignInUser = async (request, h) => {
   }
 };
 
+const handlerUpdateDisplayUsername = async (request, h) => {
+  const { _displayUsername } = request.payload;
+  const credentialsuser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const findUser = await modelFindUserGlobal(credentialsuser.email_google);
+
+    if (findUser.tokenWeb !== tokenSplit[1]) {
+      return h.response({
+        status: 'fail',
+        message: 'Token tidak sesuai!',
+      }).code(401);
+    }
+
+    const responseUpdateInformation = await modelUpdateDisplayUsername(_displayUsername, findUser.from_google.email);
+
+    if (!responseUpdateInformation.data) {
+      return h.response({
+        status: 'fail',
+        message: responseUpdateInformation?.message,
+      }).code(404);
+    }
+
+    return h.response({
+      status: 'success',
+      message: responseUpdateInformation?.message,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    return h.response({
+      status: 'fail',
+      message: 'Terjadi kesalahan saat Update Display Username',
+    }).code(404);
+  }
+};
+
 module.exports = {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
@@ -323,4 +364,5 @@ module.exports = {
   handlerProfileUser,
   handlerSignupUser,
   handlerSignInUser,
+  handlerUpdateDisplayUsername,
 };

@@ -5,6 +5,7 @@ const {
   handlerProfileUser,
   handlerSignupUser,
   handlerSignInUser,
+  handlerUpdateDisplayUsername,
 } = require("./src/ayotaku-users/handler-users/handler-users");
 const { createTokenUsers } = require("./src/utils/handler-token");
 
@@ -115,6 +116,26 @@ const routesUser = [
     handler: handlerActivatedAccount,
     options: {
       auth: false,
+      cors: true,
+      plugins: {
+        'hapi-rate-limit': {
+          pathLimit: 5,
+          pathCache: {
+            expiresIn: 10000,
+          },
+          authCache: {
+            expiresIn: 5000,
+          },
+        },
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/user/api/profile',
+    handler: handlerUpdateDisplayUsername,
+    options: {
+      auth: 'jwtUsers',
       cors: true,
       plugins: {
         'hapi-rate-limit': {

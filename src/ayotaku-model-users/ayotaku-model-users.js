@@ -241,6 +241,44 @@ const findUserForValidateToken = async (userInformation) => {
   }
 };
 
+const modelUpdateDisplayUsername = async (_displayUsername, email) => {
+  const query = {
+    "from_google.email": email,
+  };
+
+  try {
+    const checkingEmailStatus = await collection.findOne(query);
+    if (!checkingEmailStatus.account_active) {
+      return {
+        status: 'fail',
+        message: 'Account belom aktif',
+        data: false,
+      };
+    }
+
+    if (checkingEmailStatus.length === 0) {
+      return {
+        data: false,
+      };
+    }
+
+    const dataUpdate = {
+      $set: {
+        displayUsername: _displayUsername,
+      },
+    };
+    const updateUserInformation = await collection.updateOne(query, dataUpdate);
+    return {
+      status: 'success',
+      message: 'Berhasil diupdate!',
+      data: true,
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   modelFindUserGlobal,
   modelSaveUserInformation,
@@ -248,4 +286,5 @@ module.exports = {
   modelActivatedAccount,
   modelFindUserByUsername,
   findUserForValidateToken,
+  modelUpdateDisplayUsername,
 };
