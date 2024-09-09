@@ -7,6 +7,7 @@ const {
   USER_EMAIL_SUPPORT,
   PASSWORD_EMAIL_SUPPORT,
 } = require('../../utils/secret.json');
+const { validateInputDisplayUsername } = require('../../utils/handler-tools');
 const {
   modelSaveUserInformation,
   modelUpdateUserInfoLogin,
@@ -326,6 +327,27 @@ const handlerUpdateDisplayUsername = async (request, h) => {
   const tokenSplit = tokenUser.split(' ');
 
   try {
+    if (!_displayUsername) {
+      return h.response({
+        status: 'fail',
+        message: 'Display Username tidak boleh kosong!',
+      }).code(400);
+    }
+
+    if (_displayUsername.length > 15) {
+      return h.response({
+        status: 'fail',
+        message: 'Limit 15 character!',
+      }).code(400);
+    }
+
+    if (!validateInputDisplayUsername(_displayUsername)) {
+      return h.response({
+        status: 'fail',
+        message: 'Hanya boleh memakai simbol - dan _',
+      }).code(400);
+    }
+
     const findUser = await modelFindUserGlobal(credentialsuser.email_google);
 
     if (findUser.tokenWeb !== tokenSplit[1]) {
