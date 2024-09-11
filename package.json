@@ -27,6 +27,7 @@
     "hapi-auth-jwt2": "^10.5.1",
     "hapi-rate-limit": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
+    "moment": "^2.30.1",
     "mongodb": "^6.5.0",
     "nanoid": "3.3.3",
     "nodemailer": "^6.9.14"
