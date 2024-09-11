@@ -3,6 +3,7 @@ const {
   HOST_TRANSPORT_EMAIL,
   USER_EMAIL_SUPPORT,
   PASSWORD_EMAIL_SUPPORT,
+  URI_SELF_WEB,
 } = require('../utils/secret.json');
 
 const sendCodeVerifyUser = async (emailUser, code) => {
@@ -58,7 +59,7 @@ const sendCodeVerifyUser = async (emailUser, code) => {
                 <p>Ini adalah Email Otomatis yang dikirim kan kepada User untuk memberikan Link Activation Email. Klik lik dibawah ini untuk Activation Email anda!</p>
                 <p>Click Button dibawah ini ya...😊</p>
                 
-                <a href="http://localhost:5173/activate?email=${emailUser}&code=${code}" class="btn-primary">Activation Email</a>
+                <a href="${URI_SELF_WEB}activate?email=${emailUser}&code=${code}" class="btn-primary">Activation Email</a>
                 <break>
                 <p>Best regards,<br>Ayotaku.id Team</p>
               </div>
@@ -92,57 +93,121 @@ const sendLinkChangePassword = async (emailUser, data) => {
     to: emailUser,
     subject: '[no-reply] Reset Password',
     html: `<!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        </head>
-        <body>
-          <div class="container">
-            <div class="row">
-              <div class="col-md-12">
-                <div class="card mt-2" style="width: 70%;">
-                  <div class="card-body">
-                    <h5 class="card-title">Reset Password</h5>
-                    <p class="card-text" style="font-size: 13px;">
-                      Ini adalah Email Otomatis yang dikirim kan kepada User untuk memberikan Link Reset Password, Click button di bawah ini untuk masuk ke Form Reset Password Account Ayotaku.id! <strong>Link hanya berlaku selama 2 Menit.</strong>
-                    </p>
-                    <a class="btn btn-primary btn-sm" id="click">Reset Password</a>
+        <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+              body {
+                font-family: Arial, sans-serif;
+                background-color: #f8f9fa;
+                margin: 0;
+                padding: 0;
+              }
 
-                    <p class="card-text mt-4" style="font-size: 13px;">Atau kalian bisa Click URL dibawah ini jika Button tidak mengarahkan Anda ke Form Reset Password.</p>
-                    <a 
-                      href="http://localhost:5173/profile/me/password?email=asd&code=asd&exp=asd" 
-                      style="font-size: 13px;"
-                    >
-                      http://localhost:5173/profile/me/password?email=asd&code=asd&exp=asd
-                    </a>
+              .container {
+                width: 90%;
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 20px;
+              }
+
+              .row {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+              }
+
+              .col-md-12 {
+                flex: 0 0 100%;
+                max-width: 100%;
+              }
+
+              .card {
+                background-color: #f9f9f9;
+                border-radius: 5px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border: 1px #6e6e6e solid;
+                margin-top: 20px;
+                padding: 20px;
+                width: 70%;
+              }
+
+              .card-body {
+                padding: 20px;
+              }
+
+              .card-title {
+                font-size: 1.5rem;
+                font-weight: bold;
+                margin-bottom: 10px;
+              }
+
+              .card-text {
+                font-size: 13px;
+                margin-bottom: 20px;
+                line-height: 1.5;
+              }
+
+              .btn {
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                display: inline-block;
+                font-size: 12px;
+                cursor: pointer;
+              }
+
+              .btn:hover {
+                background-color: #0056b3;
+              }
+
+              a {
+                color: #007bff;
+                text-decoration: none;
+              }
+
+              a:hover {
+                text-decoration: underline;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Reset Password [ ${emailUser} ]</h5>
+                      <p class="card-text">
+                        Ini adalah Email Otomatis yang dikirimkan kepada User untuk memberikan Link Reset Password. Klik button di bawah ini untuk masuk ke Form Reset Password Account Ayotaku.id! <strong>Link hanya berlaku selama 2 Menit.</strong>
+                      </p>
+                      <a href="${URI_SELF_WEB}profile/me/password?email=${emailUser}&code=${data.code}&exp=${data.exp}" 
+                        style="background-color:#007bff; color:white; padding:10px 20px; text-decoration:none; border-radius:5px; font-size:12px; display:inline-block;">
+                        Reset Password
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <script>
-            document.getElementById('click').onclick = () => {
-              const url = 'http://localhost:5173/profile/me/password?email=asd&code=asd&exp=asd'
-              window.open(url, "_blank");
-            }
-          </script>
-          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        </body>
-      </html>`,
+          </body>
+        </html>
+    `,
   };
 
-  transporterEmail.sendMail(mailOptions, (error, info) => {
+  const responseTrans = transporterEmail.sendMail(mailOptions, (error, info) => {
     if (error) {
       console.log(error);
       return {
-        status: 'fail',
+        status: false,
       };
     }
 
     return {
-      status: 'success',
+      status: true,
       data: info.messageId,
     };
   });
