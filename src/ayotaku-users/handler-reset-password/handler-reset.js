@@ -38,6 +38,42 @@ const handlerSendLinkResetPassword = async (request, h) => {
   }
 };
 
+const handlerValidateSessionReset = async (request, h) => {
+  const { emailUser, codeUser, expiredUser } = request.payload;
+  const credentialsuser = request.auth.credentials;
+  const tokenUsers = request.headers.authorization;
+  const tokenSplit = tokenUsers.split(' ');
+
+  try {
+    const findUserFirst = await modelFindUserGlobal(credentialsuser.email_google);
+
+    if (findUserFirst.length > 0) {
+      return h.response({
+        status: 'fail',
+        message: 'User tidak ditemukan!',
+      }).code(400);
+    }
+
+    const responseValidateTicket = await validateCode(findUserFirst.uuid, codeUser);
+
+    if (!responseValidateTicket.validate) {
+      return h.response({
+        status: 'fail',
+        message: responseValidateTicket.message,
+      }).code(404);
+    }
+
+    return h.response({
+      status: 'success',
+      message: responseValidateTicket,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSendLinkResetPassword,
+  handlerValidateSessionReset,
 };

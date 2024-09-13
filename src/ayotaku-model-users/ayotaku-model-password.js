@@ -20,14 +20,15 @@ const modelSaveResetPassword = async (fieldInformationReset) => {
   }
 };
 
-const modelFindTicketResetPassword = async (ticketCode) => {
+const modelFindTicketResetPassword = async (_userId, ticketCode) => {
   const query = {
+    userId: _userId,
     code: ticketCode,
   };
 
   try {
     const findTicket = await collection.findOne(query);
-    if (findTicket.length === 0) {
+    if (!findTicket) {
       return {
         ticket: false,
       };

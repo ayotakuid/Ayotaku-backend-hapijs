@@ -11,7 +11,7 @@ const createTicketCodeReset = (userId) => {
 
 const validateCode = async (userId, ticketCode) => {
   try {
-    const findTicket = await modelFindTicketResetPassword(ticketCode);
+    const findTicket = await modelFindTicketResetPassword(userId, ticketCode);
 
     if (!findTicket.ticket) {
       return {
@@ -31,7 +31,7 @@ const validateCode = async (userId, ticketCode) => {
     if (isExpired) {
       return {
         validate: false,
-        message: 'Code telah expired!',
+        message: 'Kode Reset Expired!',
       };
     }
 
