@@ -1,4 +1,4 @@
-const { handlerSendLinkResetPassword, handlerValidateSessionReset } = require("./src/ayotaku-users/handler-reset-password/handler-reset");
+const { handlerSendLinkResetPassword, handlerValidateSessionReset, handlerFormResetPassword } = require("./src/ayotaku-users/handler-reset-password/handler-reset");
 const {
   handlerGoogleLoginUsers,
   handlerCallbackAfterLoginGoogle,
@@ -175,6 +175,26 @@ const routesUser = [
     method: 'POST',
     path: '/user/api/ticket',
     handler: handlerValidateSessionReset,
+    options: {
+      auth: 'jwtUsers',
+      cors: true,
+      plugins: {
+        'hapi-rate-limit': {
+          pathLimit: 5,
+          pathCache: {
+            expiresIn: 10000,
+          },
+          authCache: {
+            expiresIn: 5000,
+          },
+        },
+      },
+    },
+  },
+  {
+    method: 'PUT',
+    path: '/user/api/ticket/reset',
+    handler: handlerFormResetPassword,
     options: {
       auth: 'jwtUsers',
       cors: true,
