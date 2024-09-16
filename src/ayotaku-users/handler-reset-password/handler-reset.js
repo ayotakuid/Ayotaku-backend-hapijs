@@ -1,7 +1,8 @@
-const { modelSaveResetPassword } = require("../../ayotaku-model-users/ayotaku-model-password");
+const { modelSaveResetPassword, modelChangePassword } = require("../../ayotaku-model-users/ayotaku-model-password");
 const { modelFindUserGlobal } = require("../../ayotaku-model-users/ayotaku-model-users");
 const { sendLinkChangePassword } = require("../../ayotaku-model-users/ayotaku-send-email");
-const { validateCode, createTicketCodeReset } = require("../../utils/handler-moment");
+const { validateCode, createTicketCodeReset, verifyCodeCaptcha } = require("../../utils/handler-moment");
+const { generateHashPassword } = require("../../utils/handler-token");
 
 const handlerSendLinkResetPassword = async (request, h) => {
   const credentialsuser = request.auth.credentials;
@@ -73,7 +74,76 @@ const handlerValidateSessionReset = async (request, h) => {
   }
 };
 
+const handlerFormResetPassword = async (request, h) => {
+  const { newPassword, codeCaptcha, codeTicket } = request.payload;
+  const credentialsuser = request.auth.credentials;
+  const tokenUser = request.auth.authorization;
+
+  const findUser = await modelFindUserGlobal(credentialsuser.email_google);
+
+  if (!findUser) {
+    return h.response({
+      status: 'fail',
+      message: 'User tidak ditemukan!',
+    }).code(404);
+  }
+
+  const validate = await validateCode(findUser.uuid, codeTicket);
+
+  if (!validate.validate) {
+    return h.response({
+      status: 'fail',
+      message: validate.message,
+    }).code(400);
+  }
+
+  if (!newPassword) {
+    return h.response({
+      status: 'fail',
+      message: 'Password tidak boleh kosong!',
+    }).code(400);
+  }
+
+  if (!codeCaptcha) {
+    return h.response({
+      status: 'fail',
+      message: 'Please verify the re-CAPTCHA!',
+    }).code(400);
+  }
+
+  if (!codeTicket) {
+    return h.response({
+      status: 'fail',
+      message: 'Code tidak boleh kosong!',
+    }).code(400);
+  }
+
+  const responseValidateCode = await verifyCodeCaptcha(codeCaptcha);
+  if (!responseValidateCode.success) {
+    return h.response({
+      status: 'fail',
+      message: 'Timeout, Try again!',
+    }).code(400);
+  }
+
+  const hashPassword = await generateHashPassword(newPassword);
+  const modelChange = await modelChangePassword(findUser.from_google.email, hashPassword);
+
+  if (!modelChange.status) {
+    return h.response({
+      status: 'fail',
+      message: 'Change Password gagal!',
+    }).code(400);
+  }
+
+  return h.response({
+    status: 'success',
+    message: 'Change password success!',
+  }).code(200);
+};
+
 module.exports = {
   handlerSendLinkResetPassword,
   handlerValidateSessionReset,
+  handlerFormResetPassword,
 };
