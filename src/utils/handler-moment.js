@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { nanoid } = require('nanoid');
 const { modelFindTicketResetPassword } = require('../ayotaku-model-users/ayotaku-model-password');
+const { URI_GOOGLE_VALIDATE_CAPTCHA, RECAPTCHA_SECRET_KEY } = require('./secret.json');
 
 const createTicketCodeReset = (userId) => {
   const code = nanoid(64);
@@ -45,7 +46,24 @@ const validateCode = async (userId, ticketCode) => {
   }
 };
 
+const verifyCodeCaptcha = async (captchaValue) => {
+  try {
+    const requestOptions = {
+      method: "POST",
+      redirect: "follow",
+    };
+    const responseFetchingVerif = await fetch(`${URI_GOOGLE_VALIDATE_CAPTCHA}?secret=${RECAPTCHA_SECRET_KEY}&response=${captchaValue}`, requestOptions);
+    const returnData = await responseFetchingVerif.json();
+
+    return returnData;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   createTicketCodeReset,
   validateCode,
+  verifyCodeCaptcha,
 };
