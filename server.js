@@ -53,7 +53,7 @@ const init = async () => {
     host: 'localhost',
     routes: {
       cors: {
-        origin: ['http://127.0.0.1:8000', 'http://localhost:5173'],
+        origin: ['http://127.0.0.1:8000', 'http://localhost:5173', 'http://localhost:5174'],
         credentials: true,
       },
     },
