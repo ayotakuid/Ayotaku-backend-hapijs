@@ -373,6 +373,32 @@ const handlerModelGetAllAnime = async () => {
   }
 };
 
+const handlerModelSearchAnime = async (searchAnime) => {
+  try {
+    const queryAnime = {
+      $or: [
+        {
+          'data.nama_anime.eng': {
+            $regex: searchAnime,
+            $options: 'i',
+          },
+        },
+        {
+          'data.nama_anime.romanji': {
+            $regex: searchAnime,
+            $options: 'i',
+          },
+        },
+      ],
+    };
+    const getAllAnime = await collection.find(queryAnime).toArray();
+    return getAllAnime;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -383,4 +409,5 @@ module.exports = {
   handlerModelSyncAnime,
   handlerModelManualEditAnime,
   handlerModelGetAllAnime,
+  handlerModelSearchAnime,
 };
