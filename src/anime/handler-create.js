@@ -1,4 +1,11 @@
-const { handlerCheckingAnime, handlerSaveAnime, handlerModelManualEditAnime } = require('../model/model-anime');
+const {
+  handlerCheckingAnime,
+  handlerSaveAnime,
+  handlerModelManualEditAnime,
+  handlerModelCheckingRecommend,
+  handlerGetAllRecommend,
+  handlerModelSaveRecommend,
+} = require('../model/model-anime');
 const { handlerUserByNameMAL } = require('../model/model-users');
 const { checkingTokenForAll } = require('../utils/handler-token');
 
@@ -25,7 +32,7 @@ const handlerCreateAnime = async (request, h) => {
       return h.response({
         status: 'fail',
         message: 'Anime sudah ada!',
-      }).code(401);
+      }).code(400);
     }
 
     const insertAnime = await handlerSaveAnime(data, credentialsUser.id_mal);
@@ -71,7 +78,72 @@ const handlerManualEditAnime = async (request, h) => {
   }
 };
 
+const handlerCreateRecommendAnime = async (request, h) => {
+  const {
+    id_anime,
+    slug_anime,
+    default_img,
+    edit_img,
+  } = request.payload;
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUser.name_mal);
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+    const dataRecommend = await handlerGetAllRecommend();
+
+    if (!userFind) {
+      return h.response({
+        status: 'fail',
+        message: 'Kamu loh siapa?',
+      }).code(400);
+    }
+
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    if (dataRecommend.length === 10) {
+      return h.response({
+        status: 'fail',
+        message: 'Data Recommend Anime sudah max!',
+      }).code(400);
+    }
+
+    const checkingDataRecommend = await handlerModelCheckingRecommend(id_anime);
+
+    if (checkingDataRecommend) {
+      return h.response({
+        status: 'fail',
+        message: 'Anime sudah ada!',
+      }).code(400);
+    }
+
+    const newRecommend = {
+      id_anime,
+      slug_anime,
+      default_img,
+      edit_img,
+    };
+
+    const saveRecommendAnime = await handlerModelSaveRecommend(newRecommend);
+    return h.response({
+      status: 'success',
+      message: 'Anime Recommend success added!',
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerCreateAnime,
   handlerManualEditAnime,
+  handlerCreateRecommendAnime,
 };

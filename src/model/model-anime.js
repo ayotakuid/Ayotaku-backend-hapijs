@@ -3,6 +3,7 @@ const { client, DB_NAME } = require('../db/config');
 
 const db = client.db(DB_NAME);
 const collection = db.collection('ayotaku_animes');
+const collectionRecommend = db.collection('ayotaku_recommend');
 
 const createSlugAnime = (title) => {
   const changeTitle = title.replace(/ /g, "-").toLowerCase();
@@ -399,6 +400,49 @@ const handlerModelSearchAnime = async (searchAnime) => {
   }
 };
 
+const handlerModelCheckingRecommend = async (idAnime) => {
+  try {
+    const query = {
+      id_anime_db: idAnime,
+    };
+
+    const searchRecommend = await collectionRecommend.findOne(query);
+    return searchRecommend;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerModelSaveRecommend = async (data) => {
+  const created = new Date().toISOString();
+
+  try {
+    const result = await collectionRecommend.insertOne({
+      uuid: nanoid(16),
+      id_anime_db: data?.id_anime,
+      slug_anime: data?.slug_anime,
+      default_img: data?.default_img,
+      edit_img: (data?.edit_img) ? data?.edit_img : null,
+      created_at: created,
+    });
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerGetAllRecommend = async () => {
+  try {
+    const getAllRecommend = await collectionRecommend.find().toArray();
+    return getAllRecommend;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -410,4 +454,7 @@ module.exports = {
   handlerModelManualEditAnime,
   handlerModelGetAllAnime,
   handlerModelSearchAnime,
+  handlerModelCheckingRecommend,
+  handlerModelSaveRecommend,
+  handlerGetAllRecommend,
 };

@@ -10,7 +10,7 @@ const { handlerTotalUser } = require("./src/users/handler-total");
 const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime, handlerSearchAnimeDatabase } = require("./src/anime/handler-search");
-const { handlerCreateAnime, handlerManualEditAnime } = require("./src/anime/handler-create");
+const { handlerCreateAnime, handlerManualEditAnime, handlerCreateRecommendAnime } = require("./src/anime/handler-create");
 const { handlerShowAllAnime, handlerShowDeleteAnime, handlerSyncAnime } = require("./src/anime/handler-show");
 const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
 const { handlerCreateEpisode, handlerEditEpisode } = require("./src/episode/handler-create-episode");
@@ -238,6 +238,15 @@ const routes = [
     method: 'GET',
     path: '/api/anime/searchAnime',
     handler: handlerSearchAnimeDatabase,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/anime/recommend',
+    handler: handlerCreateRecommendAnime,
     options: {
       auth: 'jwt',
       cors: true,
