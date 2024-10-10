@@ -1,4 +1,9 @@
-const { handlerModelShowAnime, handlerModelShowAnimeDelete, handlerModelSyncAnime } = require('../model/model-anime');
+const {
+  handlerModelShowAnime,
+  handlerModelShowAnimeDelete,
+  handlerModelSyncAnime,
+  handlerModelAggregateRecommend,
+} = require('../model/model-anime');
 const { handlerUserByNameMAL } = require('../model/model-users');
 const { handlerFetchingDetailAnime } = require('../utils/handler-axios');
 const { checkingTokenForAll } = require('../utils/handler-token');
@@ -97,8 +102,36 @@ const handlerSyncAnime = async (request, h) => {
   }
 };
 
+const handlerGetRecommendAnime = async (request, h) => {
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    const modelShowRecommendAnime = await handlerModelAggregateRecommend();
+    return h.response({
+      status: 'success',
+      message: 'Recommend Anime',
+      data: modelShowRecommendAnime,
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerShowAllAnime,
   handlerShowDeleteAnime,
   handlerSyncAnime,
+  handlerGetRecommendAnime,
 };

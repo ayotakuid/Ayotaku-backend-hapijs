@@ -11,7 +11,12 @@ const { handlerLogs } = require("./src/logs/handler-logs");
 const { handlerFethcingScheduleWeek } = require("./src/utils/handler-axios");
 const { handlerSearchAnime, handlerDetailAnime, handlerSearchAnimeDatabase } = require("./src/anime/handler-search");
 const { handlerCreateAnime, handlerManualEditAnime, handlerCreateRecommendAnime } = require("./src/anime/handler-create");
-const { handlerShowAllAnime, handlerShowDeleteAnime, handlerSyncAnime } = require("./src/anime/handler-show");
+const {
+  handlerShowAllAnime,
+  handlerShowDeleteAnime,
+  handlerSyncAnime,
+  handlerGetRecommendAnime,
+} = require("./src/anime/handler-show");
 const { handlerSoftDeleteByUuid, handlerRecoveryAnime } = require("./src/anime/handler-delete");
 const { handlerCreateEpisode, handlerEditEpisode } = require("./src/episode/handler-create-episode");
 const { handlerShowAllEpisode } = require("./src/episode/handler-show-episode");
@@ -247,6 +252,15 @@ const routes = [
     method: 'POST',
     path: '/api/anime/recommend',
     handler: handlerCreateRecommendAnime,
+    options: {
+      auth: 'jwt',
+      cors: true,
+    },
+  },
+  {
+    method: 'GET',
+    path: '/api/anime/recommend',
+    handler: handlerGetRecommendAnime,
     options: {
       auth: 'jwt',
       cors: true,

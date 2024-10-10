@@ -443,6 +443,45 @@ const handlerGetAllRecommend = async () => {
   }
 };
 
+const handlerModelAggregateRecommend = async () => {
+  try {
+    const pipeLineAggregate = [
+      {
+        $lookup: {
+          from: 'ayotaku_animes',
+          localField: 'id_anime_db',
+          foreignField: 'uuid',
+          as: 'recommend',
+        },
+      },
+      {
+        $unwind: '$recommend',
+      },
+      {
+        $addFields: {
+          detail: {
+            nama_anime: '$recommend.data.nama_anime',
+            foto_anime: '$recommend.data.foto_anime',
+            media_type: '$recommend.data.media_type',
+            status: '$recommend.data.status',
+            season: '$recommend.data.season',
+            rating: '$recommend.data.rating',
+          },
+        },
+      },
+      {
+        $unset: 'recommend',
+      },
+    ];
+
+    const responseAggregate = await collectionRecommend.aggregate(pipeLineAggregate).toArray();
+    return responseAggregate;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSaveAnime,
   handlerCheckingAnime,
@@ -457,4 +496,5 @@ module.exports = {
   handlerModelCheckingRecommend,
   handlerModelSaveRecommend,
   handlerGetAllRecommend,
+  handlerModelAggregateRecommend,
 };
