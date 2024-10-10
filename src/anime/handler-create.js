@@ -108,7 +108,7 @@ const handlerCreateRecommendAnime = async (request, h) => {
       }).code(401);
     }
 
-    if (dataRecommend.length === 10) {
+    if (dataRecommend.length === 20) {
       return h.response({
         status: 'fail',
         message: 'Data Recommend Anime sudah max!',
