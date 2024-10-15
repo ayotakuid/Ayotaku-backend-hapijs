@@ -472,10 +472,75 @@ const handlerModelAggregateRecommend = async () => {
       {
         $unset: 'recommend',
       },
+      {
+        $sort: {
+          created_at: -1,
+        },
+      },
     ];
 
     const responseAggregate = await collectionRecommend.aggregate(pipeLineAggregate).toArray();
     return responseAggregate;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerModelDeleteRecommend = async (idRecommendAnime) => {
+  try {
+    const query = {
+      uuid: idRecommendAnime,
+    };
+
+    const checkingData = await collectionRecommend.findOne(query);
+
+    if (!checkingData) {
+      return {
+        status: false,
+      };
+    }
+
+    const responseDelete = await collectionRecommend.deleteOne(query);
+
+    if (responseDelete.deletedCount === 0) {
+      return {
+        status: false,
+      };
+    }
+
+    return {
+      status: true,
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerModelManualEditRecommend = async (recommendUuid, dataUpdated) => {
+  try {
+    const query = {
+      uuid: recommendUuid,
+    };
+
+    const dataUpdate = {
+      $set: {
+        edit_img: dataUpdated.image,
+      },
+    };
+
+    const updateData = await collectionRecommend.updateOne(query, dataUpdate);
+
+    if (updateData.modifiedCount === 0) {
+      return {
+        status: false,
+      };
+    }
+
+    return {
+      status: true,
+    };
   } catch (err) {
     console.error(err);
     throw err;
@@ -497,4 +562,6 @@ module.exports = {
   handlerModelSaveRecommend,
   handlerGetAllRecommend,
   handlerModelAggregateRecommend,
+  handlerModelDeleteRecommend,
+  handlerModelManualEditRecommend,
 };

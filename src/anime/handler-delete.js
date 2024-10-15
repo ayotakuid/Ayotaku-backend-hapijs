@@ -1,6 +1,7 @@
 const {
   handlerModelSoftDelete,
   handlerModelRecoveryAnime,
+  handlerModelDeleteRecommend,
 } = require('../model/model-anime');
 const { handlerUserByNameMAL } = require('../model/model-users');
 const { checkingTokenForAll } = require('../utils/handler-token');
@@ -79,7 +80,51 @@ const handlerRecoveryAnime = async (request, h) => {
   }
 };
 
+const handlerHardDeleteRecommend = async (request, h) => {
+  const { id_anime } = request.payload;
+  const credentialsUsers = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const userFind = await handlerUserByNameMAL(credentialsUsers.name_mal);
+    const isExpired = await checkingTokenForAll(credentialsUsers, tokenUser);
+
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    if (userFind.role !== 'admin') {
+      return h.response({
+        status: 'fail',
+        message: 'Kami tidak berhak!',
+      }).code(401);
+    }
+
+    const hardDeleteRecommend = await handlerModelDeleteRecommend(id_anime);
+
+    if (!hardDeleteRecommend.status) {
+      return h.response({
+        status: 'fail',
+        message: 'Failed delete Recommend anime',
+      }).code(400);
+    }
+
+    return h.response({
+      status: 'success',
+      message: 'Success delete Recommend anime',
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerSoftDeleteByUuid,
   handlerRecoveryAnime,
+  handlerHardDeleteRecommend,
 };

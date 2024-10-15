@@ -5,6 +5,7 @@ const {
   handlerModelCheckingRecommend,
   handlerGetAllRecommend,
   handlerModelSaveRecommend,
+  handlerModelManualEditRecommend,
 } = require('../model/model-anime');
 const { handlerUserByNameMAL } = require('../model/model-users');
 const { checkingTokenForAll } = require('../utils/handler-token');
@@ -142,8 +143,47 @@ const handlerCreateRecommendAnime = async (request, h) => {
   }
 };
 
+const handlerManualEditRecommend = async (request, h) => {
+  const { recommendUuid, imageURL } = request.payload;
+  const credentialsUser = request.auth.credentials;
+  const tokenUser = request.headers.authorization;
+  const tokenSplit = tokenUser.split(' ');
+
+  try {
+    const isExpired = await checkingTokenForAll(credentialsUser, tokenUser);
+
+    if (isExpired !== true) {
+      return h.response({
+        status: isExpired?.status,
+        message: isExpired?.message,
+      }).code(401);
+    }
+
+    const dataNeeded = {
+      image: imageURL,
+    };
+    const responseUpdateRecommend = await handlerModelManualEditRecommend(recommendUuid, dataNeeded);
+
+    if (!responseUpdateRecommend.status) {
+      return h.response({
+        status: 'fail',
+        message: 'Data gagal diupdate!',
+      }).code(400);
+    }
+
+    return h.response({
+      status: 'success',
+      message: 'Data berhasil diupdate!',
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerCreateAnime,
   handlerManualEditAnime,
   handlerCreateRecommendAnime,
+  handlerManualEditRecommend,
 };
