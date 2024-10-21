@@ -6,9 +6,13 @@ const collection = db.collection('ayotaku_animes');
 const collectionRecommend = db.collection('ayotaku_recommend');
 
 const createSlugAnime = (title) => {
-  const changeTitle = title.replace(/ /g, "-").toLowerCase();
-  const removeSpecial = changeTitle.replace(/[^\w\s.\-]/g, "");
-  return `${removeSpecial}-${new Date().getTime()}`;
+  const sanitizedTitle = title
+    .replace(/[^\w\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .toLowerCase();
+
+  return `${sanitizedTitle}-${Date.now()}`;
 };
 
 const handlerSaveAnime = async (data, admin) => {
