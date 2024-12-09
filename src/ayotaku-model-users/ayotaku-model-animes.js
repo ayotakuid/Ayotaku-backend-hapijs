@@ -2,6 +2,7 @@ const { client, DB_NAME } = require('../db/config');
 
 const db = client.db(DB_NAME);
 const collectionRecommend = db.collection('ayotaku_recommend');
+const collectionAnimes = db.collection('ayotaku_animes');
 
 const handlerModelUserlAggregateRecommend = async () => {
   try {
@@ -46,6 +47,79 @@ const handlerModelUserlAggregateRecommend = async () => {
   }
 };
 
+const handlerModelLastUpdate = async (filterYear, filterSeason) => {
+  try {
+    const parseYear = parseInt(filterYear, 10);
+    const pipeLineAggregate = [
+      {
+        $match: {
+          $or: filterSeason.map((season) => ({
+            "data.season.year": parseYear,
+            "data.season.season": season,
+          })),
+        },
+      },
+      {
+        $lookup: {
+          from: 'ayotaku_episode',
+          localField: 'uuid',
+          foreignField: 'id_anime',
+          as: 'episodes',
+          pipeline: [
+            {
+              $sort: {
+                createdAt: -1,
+              },
+            },
+            {
+              $limit: 5,
+            },
+          ],
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Hapus `_id` bawaan MongoDB
+          id: '$uuid', // ID anime
+          nama_anime: '$data.nama_anime',
+          foto_anime: '$data.foto_anime',
+          slug_anime: '$slug',
+          rating: '$data.rating',
+          season: '$data.season',
+          media_type: '$data.media_type',
+          status: '$data.status',
+          detail_eps: {
+            $map: {
+              input: '$episodes', // Array episodes sudah terurut
+              as: 'ep',
+              in: {
+                id: '$$ep.uuid',
+                slug_eps: '$$ep.slug_eps',
+                episode: '$$ep.episode',
+                link_stream: '$$ep.link_stream',
+                link_download: '$$ep.link_download',
+                created_at: '$$ep.createdAt',
+              },
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          "detail_eps.created_at": -1,
+        },
+      },
+    ];
+
+    const responseAggregate = await collectionAnimes.aggregate(pipeLineAggregate).toArray();
+    return responseAggregate;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerModelUserlAggregateRecommend,
+  handlerModelLastUpdate,
 };

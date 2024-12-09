@@ -1,4 +1,4 @@
-const { handlerUserGetRecommendAnime } = require("./src/ayotaku-users/handler-animes/handler-anime");
+const { handlerUserGetRecommendAnime, handlerAnimeGetLastUpdate } = require("./src/ayotaku-users/handler-animes/handler-anime");
 const { handlerSendLinkResetPassword, handlerValidateSessionReset, handlerFormResetPassword } = require("./src/ayotaku-users/handler-reset-password/handler-reset");
 const {
   handlerGoogleLoginUsers,
@@ -216,6 +216,26 @@ const routesUser = [
     method: 'GET',
     path: '/user/api/anime/recommend',
     handler: handlerUserGetRecommendAnime,
+    options: {
+      auth: false,
+      cors: true,
+      plugins: {
+        'hapi-rate-limit': {
+          pathLimit: 50,
+          pathCache: {
+            expiresIn: 5000,
+          },
+          authCache: {
+            expiresIn: 5000,
+          },
+        },
+      },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/user/api/anime/last',
+    handler: handlerAnimeGetLastUpdate,
     options: {
       auth: false,
       cors: true,
