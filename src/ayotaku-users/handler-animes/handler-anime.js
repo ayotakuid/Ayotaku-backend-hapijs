@@ -49,14 +49,16 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
   const currentMonth = today.getMonth() + 1;
   const currentFilterSeason = currentSeason(currentMonth);
 
+  // INI SANGAT PENTING UNTUK DI INGAT KARENA INI UNTUK KENDALIKAN MUNCUL ATAU TIDAKNYA DATA ANIME
   const {
-    filterYear = new Date().getFullYear(),
+    filterYear = new Date().getFullYear().toString(),
     filterSeason = currentFilterSeason,
     limit = "10",
   } = request.query;
 
   try {
     const splitSeason = filterSeason.split(',');
+    const splitYear = filterYear.split(',').map((year) => parseInt(year, 10));
 
     const isValid = splitSeason.every((item) => typeof item === 'string');
     if (!isValid) {
@@ -66,7 +68,7 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
       }).code(400);
     }
 
-    const dataLastUpdate = await handlerModelLastUpdate(filterYear, splitSeason);
+    const dataLastUpdate = await handlerModelLastUpdate(splitYear, splitSeason);
     const limitData = dataLastUpdate.slice(0, parseInt(limit, 10));
 
     return h.response({

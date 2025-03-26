@@ -49,14 +49,12 @@ const handlerModelUserlAggregateRecommend = async () => {
 
 const handlerModelLastUpdate = async (filterYear, filterSeason) => {
   try {
-    const parseYear = parseInt(filterYear, 10);
+    // const parseYear = parseInt(filterYear, 10);
     const pipeLineAggregate = [
       {
         $match: {
-          $or: filterSeason.map((season) => ({
-            "data.season.year": parseYear,
-            "data.season.season": season,
-          })),
+          "data.season.season": { $in: filterSeason.map((season) => season.toLowerCase()) },
+          "data.season.year": { $in: filterYear.map((year) => year) },
         },
       },
       {
