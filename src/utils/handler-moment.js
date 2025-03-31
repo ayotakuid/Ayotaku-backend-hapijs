@@ -62,8 +62,37 @@ const verifyCodeCaptcha = async (captchaValue) => {
   }
 };
 
+const formatDateForSuggested = async () => {
+  const now = new Date();
+  // Tambah 1 hari
+  now.setUTCDate(now.getUTCDate() + 1);
+
+  // Atur waktu ke 00:00 UTC
+  now.setUTCHours(0, 0, 0, 0);
+
+  // INI SUDAH JAM 7 PAGI DI INDONESIA
+  return new Date(now.getTime());
+};
+
+const checkingDateSuggested = async (date) => {
+  const dateChecking = new Date(); // Tanggal saat ini
+  const differenceInMs = date - dateChecking; // Selisih dalam ms
+  const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24); // Konversi ke hari
+  const differenceInSeconds = Math.floor(differenceInMs / 1000);
+  const differenceInMinutes = Math.floor(differenceInSeconds / 60);
+  const differenceInHours = Math.floor(differenceInMinutes / 60);
+  const remainingMinutes = differenceInMinutes % 60;
+  const remainingSeconds = differenceInSeconds % 60;
+
+  console.log(`Selisih waktu: ${differenceInHours} jam, ${remainingMinutes} menit, ${remainingSeconds} detik`);
+
+  return { status: differenceInDays >= 1 };
+};
+
 module.exports = {
   createTicketCodeReset,
   validateCode,
   verifyCodeCaptcha,
+  checkingDateSuggested,
+  formatDateForSuggested,
 };
