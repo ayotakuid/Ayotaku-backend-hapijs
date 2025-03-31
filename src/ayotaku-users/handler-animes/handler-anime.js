@@ -1,5 +1,11 @@
-const { handlerModelUserlAggregateRecommend, handlerModelLastUpdate } = require("../../ayotaku-model-users/ayotaku-model-animes");
+const {
+  handlerModelUserlAggregateRecommend,
+  handlerModelLastUpdate,
+  handlerModelSuggestedGet,
+  handlerModelSuggestedInsert,
+} = require("../../ayotaku-model-users/ayotaku-model-animes");
 const { currentSeason } = require("../../utils/handler-tools");
+const { checkingDateSuggested, formatDateForSuggested } = require('../../utils/handler-moment');
 
 const handlerUserGetRecommendAnime = async (request, h) => {
   const { max_recommend } = request.query;
@@ -84,7 +90,36 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
   }
 };
 
+const handlerAnimeSuggested = async (request, h) => {
+  try {
+    const suggestedDate = await formatDateForSuggested();
+    const checking = await checkingDateSuggested(suggestedDate);
+
+    if (!checking.status) {
+      return h.response({
+        status: 'success',
+        message: 'Belum waktunya refresh suggested anime',
+        data: await handlerModelSuggestedGet(),
+      }).code(200);
+    }
+
+    await handlerModelSuggestedInsert();
+    return h.response({
+      status: 'success',
+      message: 'Berhasil refresh Suggested Anime',
+      data: await handlerModelSuggestedGet(),
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    return h.response({
+      status: 'error',
+      message: 'Terjadi kesalahan, coba lagi nanti!',
+    }).code(400);
+  }
+};
+
 module.exports = {
   handlerUserGetRecommendAnime,
   handlerAnimeGetLastUpdate,
+  handlerAnimeSuggested,
 };

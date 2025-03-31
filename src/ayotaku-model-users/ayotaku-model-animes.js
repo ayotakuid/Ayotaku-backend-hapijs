@@ -1,8 +1,10 @@
 const { client, DB_NAME } = require('../db/config');
+const { formatDateForSuggested } = require("../utils/handler-moment");
 
 const db = client.db(DB_NAME);
 const collectionRecommend = db.collection('ayotaku_recommend');
 const collectionAnimes = db.collection('ayotaku_animes');
+const collectionSuggest = db.collection('ayotaku_suggested');
 
 const handlerModelUserlAggregateRecommend = async () => {
   try {
@@ -117,7 +119,43 @@ const handlerModelLastUpdate = async (filterYear, filterSeason) => {
   }
 };
 
+const handlerModelSuggestedInsert = async () => {
+  try {
+    const randomSuggested = await collectionAnimes.aggregate([
+      { $sample: { size: 12 } }, { $project: { _id: 0 } }, { $sort: { created_at: -1 } },
+    ]).toArray();
+
+    const bulkInsertData = await Promise.all(randomSuggested.map(async (item) => ({
+      refreshDate: (await formatDateForSuggested()).toISOString(),
+      dataNimes: {
+        id_anime: item.uuid,
+        slug: item.slug,
+        animes: item.data,
+      },
+    })));
+
+    await collectionSuggest.deleteMany();
+    await collectionSuggest.insertMany(bulkInsertData);
+    return { status: "success", message: "Data inserted successfully" };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
+const handlerModelSuggestedGet = async () => {
+  try {
+    const findAll = await collectionSuggest.find().toArray();
+    return findAll;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerModelUserlAggregateRecommend,
   handlerModelLastUpdate,
+  handlerModelSuggestedInsert,
+  handlerModelSuggestedGet,
 };
