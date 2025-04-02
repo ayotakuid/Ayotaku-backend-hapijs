@@ -25,8 +25,17 @@ const currentSeason = (month) => {
   return 'fall'; // Default untuk Oktober-Desember
 };
 
+const checkingPreviousSeason = (seasonNow, seasonPrev) => {
+  if (seasonNow.includes(seasonPrev)) {
+    return seasonNow; // Jika sudah ada, kembalikan tanpa perubahan
+  }
+
+  return [...seasonNow, seasonPrev]; // Tambahkan seasonPrev jika belum ada
+};
+
 module.exports = {
   validateInputDisplayUsername,
   previousSeason,
   currentSeason,
+  checkingPreviousSeason,
 };

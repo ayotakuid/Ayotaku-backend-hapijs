@@ -76,15 +76,8 @@ const formatDateForSuggested = async () => {
 
 const checkingDateSuggested = async (date) => {
   const dateChecking = new Date(); // Tanggal saat ini
-  const differenceInMs = date - dateChecking; // Selisih dalam ms
+  const differenceInMs = dateChecking - date; // Selisih dalam ms
   const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24); // Konversi ke hari
-  const differenceInSeconds = Math.floor(differenceInMs / 1000);
-  const differenceInMinutes = Math.floor(differenceInSeconds / 60);
-  const differenceInHours = Math.floor(differenceInMinutes / 60);
-  const remainingMinutes = differenceInMinutes % 60;
-  const remainingSeconds = differenceInSeconds % 60;
-
-  console.log(`Selisih waktu: ${differenceInHours} jam, ${remainingMinutes} menit, ${remainingSeconds} detik`);
 
   return { status: differenceInDays >= 1 };
 };

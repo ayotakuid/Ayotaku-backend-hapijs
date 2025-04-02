@@ -4,7 +4,7 @@ const {
   handlerModelSuggestedGet,
   handlerModelSuggestedInsert,
 } = require("../../ayotaku-model-users/ayotaku-model-animes");
-const { currentSeason } = require("../../utils/handler-tools");
+const { currentSeason, previousSeason, checkingPreviousSeason } = require("../../utils/handler-tools");
 const { checkingDateSuggested, formatDateForSuggested } = require('../../utils/handler-moment');
 
 const handlerUserGetRecommendAnime = async (request, h) => {
@@ -65,6 +65,8 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
   try {
     const splitSeason = filterSeason.split(',');
     const splitYear = filterYear.split(',').map((year) => parseInt(year, 10));
+    const filterPreviousSeason = previousSeason(currentFilterSeason);
+    const checkingPrevSeason = checkingPreviousSeason(splitSeason.map((item) => item.toLowerCase()), filterPreviousSeason);
 
     const isValid = splitSeason.every((item) => typeof item === 'string');
     if (!isValid) {
@@ -74,7 +76,7 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
       }).code(400);
     }
 
-    const dataLastUpdate = await handlerModelLastUpdate(splitYear, splitSeason);
+    const dataLastUpdate = await handlerModelLastUpdate(splitYear, checkingPrevSeason);
     const limitData = dataLastUpdate.slice(0, parseInt(limit, 10));
 
     return h.response({
@@ -93,13 +95,14 @@ const handlerAnimeGetLastUpdate = async (request, h) => {
 const handlerAnimeSuggested = async (request, h) => {
   try {
     const suggestedDate = await formatDateForSuggested();
-    const checking = await checkingDateSuggested(suggestedDate);
+    const oneOfDateSuggest = await handlerModelSuggestedGet();
+    const checking = await checkingDateSuggested(new Date(oneOfDateSuggest[0].refreshDate));
 
     if (!checking.status) {
       return h.response({
         status: 'success',
         message: 'Belum waktunya refresh suggested anime',
-        data: await handlerModelSuggestedGet(),
+        data: oneOfDateSuggest,
       }).code(200);
     }
 
@@ -107,7 +110,7 @@ const handlerAnimeSuggested = async (request, h) => {
     return h.response({
       status: 'success',
       message: 'Berhasil refresh Suggested Anime',
-      data: await handlerModelSuggestedGet(),
+      data: oneOfDateSuggest,
     }).code(200);
   } catch (err) {
     console.error(err);
