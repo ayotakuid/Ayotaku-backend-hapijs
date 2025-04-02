@@ -51,12 +51,16 @@ const handlerModelUserlAggregateRecommend = async () => {
 
 const handlerModelLastUpdate = async (filterYear, filterSeason) => {
   try {
-    // const parseYear = parseInt(filterYear, 10);
     const pipeLineAggregate = [
       {
         $match: {
           "data.season.season": { $in: filterSeason.map((season) => season.toLowerCase()) },
           "data.season.year": { $in: filterYear.map((year) => year) },
+        },
+      },
+      {
+        $sort: {
+          created_at: -1, // INI UNTUK MENGURUTKAN COLLECTION ANIME NYA
         },
       },
       {
@@ -68,7 +72,7 @@ const handlerModelLastUpdate = async (filterYear, filterSeason) => {
           pipeline: [
             {
               $sort: {
-                createdAt: -1,
+                createdAt: -1, // DAN YANG INI UNTUK EPISODENYA
               },
             },
             {
@@ -106,7 +110,7 @@ const handlerModelLastUpdate = async (filterYear, filterSeason) => {
       },
       {
         $sort: {
-          "detail_eps.created_at": -1,
+          "detail_eps.created_at": -1, // DAN INI SORT FINAL KHUSUS EPISODENYA
         },
       },
     ];
