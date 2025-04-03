@@ -79,7 +79,7 @@ const checkingDateSuggested = async (date) => {
   const differenceInMs = dateChecking - date; // Selisih dalam ms
   const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24); // Konversi ke hari
 
-  return { status: differenceInDays >= 1 };
+  return { status: differenceInDays >= 0.0 };
 };
 
 module.exports = {
