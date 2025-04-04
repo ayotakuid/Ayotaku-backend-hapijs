@@ -157,9 +157,37 @@ const handlerModelSuggestedGet = async () => {
   }
 };
 
+const handlerModelAnimePagination = async ({ skip = 0, limit = 18 }) => {
+  try {
+    const dataPagination = await collectionAnimes.find(
+      {},
+      { projection: { _id: 0, id_admin: 0 } },
+    ).sort({
+      created_at: -1,
+    }).skip(skip)
+      .limit(limit)
+      .toArray();
+
+    const totalData = await collectionAnimes.countDocuments();
+    const totalPages = Math.ceil(totalData / limit);
+
+    return {
+      dataPagination,
+      pagination: {
+        totalData,
+        totalPages,
+      },
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+};
+
 module.exports = {
   handlerModelUserlAggregateRecommend,
   handlerModelLastUpdate,
   handlerModelSuggestedInsert,
   handlerModelSuggestedGet,
+  handlerModelAnimePagination,
 };

@@ -3,6 +3,7 @@ const {
   handlerModelLastUpdate,
   handlerModelSuggestedGet,
   handlerModelSuggestedInsert,
+  handlerModelAnimePagination,
 } = require("../../ayotaku-model-users/ayotaku-model-animes");
 const { currentSeason, previousSeason, checkingPreviousSeason } = require("../../utils/handler-tools");
 const { checkingDateSuggested, formatDateForSuggested } = require('../../utils/handler-moment');
@@ -121,8 +122,36 @@ const handlerAnimeSuggested = async (request, h) => {
   }
 };
 
+const handlerAnimeGetPagination = async (request, h) => {
+  try {
+    const page = parseInt(request.query.page, 10) || 1;
+    const limit = parseInt(request.query.limit, 10) || 18;
+    const skip = (page - 1) * limit;
+
+    const fromModel = await handlerModelAnimePagination({ skip, limit });
+    return h.response({
+      status: 'success',
+      message: 'Data Anime Pagination',
+      data: fromModel.dataPagination,
+      pagination: {
+        totalData: fromModel.pagination.totalData,
+        totalPages: fromModel.pagination.totalPages,
+        currentPages: page,
+        perParge: limit,
+      },
+    }).code(200);
+  } catch (err) {
+    console.error(err);
+    return h.response({
+      status: 'error',
+      message: 'Terjadi kesalahan di Pagination!',
+    }).code(400);
+  }
+};
+
 module.exports = {
   handlerUserGetRecommendAnime,
   handlerAnimeGetLastUpdate,
   handlerAnimeSuggested,
+  handlerAnimeGetPagination,
 };
