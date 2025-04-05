@@ -108,10 +108,11 @@ const handlerAnimeSuggested = async (request, h) => {
     }
 
     await handlerModelSuggestedInsert();
+    const dataAfterNewInsert = await handlerModelSuggestedGet();
     return h.response({
       status: 'success',
       message: 'Berhasil refresh Suggested Anime',
-      data: oneOfDateSuggest,
+      data: dataAfterNewInsert,
     }).code(200);
   } catch (err) {
     console.error(err);
