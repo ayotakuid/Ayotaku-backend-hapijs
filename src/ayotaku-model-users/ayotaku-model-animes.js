@@ -134,7 +134,6 @@ const handlerModelSuggestedInsert = async () => {
       dataNimes: {
         id_anime: item.uuid,
         slug: item.slug,
-        animes: item.data,
       },
     })));
 
@@ -149,7 +148,39 @@ const handlerModelSuggestedInsert = async () => {
 
 const handlerModelSuggestedGet = async () => {
   try {
-    const findAll = await collectionSuggest.find().toArray();
+    const pipeLineAggregate = [
+      {
+        $lookup: {
+          from: 'ayotaku_animes',
+          localField: 'dataNimes.id_anime',
+          foreignField: 'uuid',
+          as: 'suggested',
+        },
+      },
+      {
+        $unwind: '$suggested',
+      },
+      {
+        $addFields: {
+          detail: {
+            nama_anime: '$suggested.data.nama_anime',
+            media_type: '$suggested.data.media_type',
+            status: '$suggested.data.status',
+            season: '$suggested.data.season',
+            rating: '$suggested.data.rating',
+          },
+        },
+      },
+      {
+        $unset: ['_id', 'dataNimes', 'id_admin'],
+      },
+      {
+        $sort: {
+          refreshDate: -1,
+        },
+      },
+    ];
+    const findAll = await collectionSuggest.aggregate(pipeLineAggregate).toArray();
     return findAll;
   } catch (err) {
     console.error(err);
