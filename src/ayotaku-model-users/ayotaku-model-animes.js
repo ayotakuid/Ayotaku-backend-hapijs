@@ -75,9 +75,6 @@ const handlerModelLastUpdate = async (filterYear, filterSeason) => {
                 createdAt: -1, // DAN YANG INI UNTUK EPISODENYA
               },
             },
-            {
-              $limit: 5,
-            },
           ],
         },
       },
