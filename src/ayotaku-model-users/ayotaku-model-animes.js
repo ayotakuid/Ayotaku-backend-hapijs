@@ -191,7 +191,7 @@ const handlerModelAnimePagination = async ({ skip = 0, limit = 18 }) => {
       {},
       { projection: { _id: 0, id_admin: 0 } },
     ).sort({
-      created_at: -1,
+      "data.nama_anime.romanji": 1,
     }).skip(skip)
       .limit(limit)
       .toArray();
