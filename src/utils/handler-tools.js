@@ -33,9 +33,25 @@ const checkingPreviousSeason = (seasonNow, seasonPrev) => {
   return [...seasonNow, seasonPrev]; // Tambahkan seasonPrev jika belum ada
 };
 
+const sortChecking = (sort) => {
+  switch (sort) {
+    case 'a-z':
+      return { "data.nama_anime.romanji": 1 };
+    case 'z-a':
+      return { "data.nama_anime.romanji": -1 };
+    case 'newest':
+      return { created_at: -1 };
+    case 'oldest':
+      return { created_at: 1 };
+    default:
+      return { "data.nama_anime.romanji": 1 };
+  }
+};
+
 module.exports = {
   validateInputDisplayUsername,
   previousSeason,
   currentSeason,
   checkingPreviousSeason,
+  sortChecking,
 };

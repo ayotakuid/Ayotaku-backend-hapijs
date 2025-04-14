@@ -1,5 +1,6 @@
 const { client, DB_NAME } = require('../db/config');
 const { formatDateForSuggested } = require("../utils/handler-moment");
+const { sortChecking } = require('../utils/handler-tools');
 
 const db = client.db(DB_NAME);
 const collectionRecommend = db.collection('ayotaku_recommend');
@@ -185,18 +186,26 @@ const handlerModelSuggestedGet = async () => {
   }
 };
 
-const handlerModelAnimePagination = async ({ skip = 0, limit = 18 }) => {
+const handlerModelAnimePagination = async ({
+  skip = 0,
+  limit = 18,
+  genresFilter = [],
+  sortBy = {},
+}) => {
   try {
+    const filterByGenres = genresFilter.length > 0 ? {
+      "data.genres.name": { $in: genresFilter.map((item) => item.charAt(0).toUpperCase() + item.slice(1)) },
+    } : {};
+    const filterBySort = sortChecking(sortBy);
+    const filterQuering = { ...filterByGenres };
     const dataPagination = await collectionAnimes.find(
-      {},
+      filterByGenres,
       { projection: { _id: 0, id_admin: 0 } },
-    ).sort({
-      "data.nama_anime.romanji": 1,
-    }).skip(skip)
+    ).sort(filterBySort).skip(skip)
       .limit(limit)
       .toArray();
 
-    const totalData = await collectionAnimes.countDocuments();
+    const totalData = await collectionAnimes.countDocuments(filterQuering);
     const totalPages = Math.ceil(totalData / limit);
 
     return {
