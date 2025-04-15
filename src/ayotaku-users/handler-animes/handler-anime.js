@@ -127,7 +127,7 @@ const handlerAnimeGetPagination = async (request, h) => {
   try {
     const page = parseInt(request.query.page, 10) || 1;
     const limit = parseInt(request.query.limit, 10) || 18;
-    const { genres, sort } = request.query;
+    const { genres, sort, search } = request.query;
     const skip = (page - 1) * limit;
 
     const checkingGenres = genres ? genres?.split(',').map((item) => item.toLowerCase()) : [];
@@ -136,6 +136,7 @@ const handlerAnimeGetPagination = async (request, h) => {
       limit,
       genresFilter: checkingGenres,
       sortBy: sort,
+      search,
     });
 
     return h.response({

@@ -191,17 +191,35 @@ const handlerModelAnimePagination = async ({
   limit = 18,
   genresFilter = [],
   sortBy = {},
+  search = '',
 }) => {
   try {
-    const filterByGenres = genresFilter.length > 0 ? {
-      "data.genres.name": { $in: genresFilter.map((item) => item.charAt(0).toUpperCase() + item.slice(1)) },
-    } : {};
+    const filterByGenres = genresFilter.length > 0
+      ? {
+        "data.genres.name": {
+          $in: genresFilter.map((item) => item.charAt(0).toUpperCase() + item.slice(1)),
+        },
+      }
+      : {};
+
+    const filterBySearch = search
+      ? {
+        $or: [
+          { 'data.nama_anime.eng': { $regex: search, $options: 'i' } },
+          { 'data.nama_anime.romanji': { $regex: search, $options: 'i' } },
+        ],
+      }
+      : {};
+
     const filterBySort = sortChecking(sortBy);
-    const filterQuering = { ...filterByGenres };
-    const dataPagination = await collectionAnimes.find(
-      filterByGenres,
-      { projection: { _id: 0, id_admin: 0 } },
-    ).sort(filterBySort).skip(skip)
+    const filterQuering = { ...filterByGenres, ...filterBySearch };
+
+    const dataPagination = await collectionAnimes
+      .find(filterQuering, {
+        projection: { _id: 0, id_admin: 0 },
+      })
+      .sort(filterBySort)
+      .skip(skip)
       .limit(limit)
       .toArray();
 
